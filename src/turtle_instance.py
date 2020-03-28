@@ -99,8 +99,8 @@ class TurtleBot:
 #-----------------------------------------------------------------------------------------#
 # Helper functions
     def euclidean_distance(self, goal_pose):
-        print("EUCLID"+self.agent_name)
-        print(goal_pose.pose.pose.position, self.odom.pose.pose.position  )
+        # print("EUCLID"+self.agent_name)
+        # print(goal_pose.pose.pose.position, self.odom.pose.pose.position  )
         """Euclidean distance between current pose and the goal."""
         return sqrt(pow((goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x), 2) +
                     pow((goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y), 2))
@@ -109,6 +109,13 @@ class TurtleBot:
     def set_heading(self,theta):
         #theta_rad = (theta * np.pi)/180
         rospy.sleep(0.1)
+        # print(theta)
+
+        # self.vel_msg = Twist()
+        # self.vel_msg.linear.x = self.odom.pose.pose.position.x
+        # self.vel_msg.linear.y = self.odom.pose.pose.position.y
+        # self.vel_msg.angular.z = theta
+        # self.velocity_publisher.publish(self.vel_msg)
         # self.turtle_teleport(self.pose.x,self.pose.y,theta)
 
     # sets heading towards given co-ordinates
@@ -119,9 +126,7 @@ class TurtleBot:
         #print(self.heading)
         return
 
-    def start_point(self,x,y):
-        rospy.sleep(0.05)
-        # self.turtle_teleport(x,y,0)
+
 
     def in_VO(self,h):
         for i in self.VO:
@@ -132,7 +137,7 @@ class TurtleBot:
 
     def in_RVO(self,h):
         #use sets for optimized code using "if h in self.RVO"
-        print("THETA AND RVO "+self.agent_name, h,self.RVO)
+        # print("THETA AND RVO "+self.agent_name, h,self.RVO)
         for i in self.RVO:
             if(self.RVO[i][0] < h < self.RVO[i][1]):
                 return True
@@ -308,53 +313,7 @@ class TurtleBot:
 
 #-----------------------------------------------------------------------------------------#
 # RVO functions
-    def move2goal_vo(self,x,y):
-        self.goal_pose = Odometry()
-
-        # Get the input from the function call.
-        self.goal_pose.pose.pose.position.x = x
-        self.goal_pose.pose.pose.position.y = y
-
-        # Please, insert a number slightly greater than 0 (e.g. 0.01).
-        distance_tolerance = 0.2
-
-        # Setting the velocity
-        #self.vel_msg = Twist()
-        #self.vel_msg.linear.x = 3
-        #self.set_goal_heading(x,y)
-        #self.velocity_publisher.publish(self.vel_msg)
-
-        #rospy.sleep(10)
-        while self.euclidean_distance(self.goal_pose) >= distance_tolerance:
-            self.vel_msg = Twist()
-            self.vel_msg.linear.x = 0.1
-            #self.velocity_publisher.publish(self.vel_msg)
-            #rospy.sleep(0.5)
-            if(self.collision() == True):
-                #vel_msg.linear.x = np.min(rvo[0]-self.heading,rvo[-1]-self.heading)+self.heading
-                #self.heading = self.rvo[np.where(np.min(abs(np.subtract(self.rvo,self.heading))))]
-                print("Inside VO. Should choose new velocity")
-                print("The new choosen velocity is : ")
-                self.heading = self.choose_new_velocity_VO()
-                #print(self.heading)
-                #self.heading = self.VO[]
-                self.set_heading(self.heading)
-                self.vel_msg.linear.x = 0.1
-            else:
-                self.set_goal_heading(x,y)
-
-            self.velocity_publisher.publish(self.vel_msg)
-            self.publish_to_information_channel(self.agent_name)
-            #print(self.all_agents_pose_dict)
-            #   rospy.sleep(0.1)
-
-        # Stopping the agent after the movement is over.
-        self.vel_msg.linear.x = 0
-        self.velocity_publisher.publish(self.vel_msg)
-
-        # If we press control + C, the node will stop.
-        #rospy.spin()
-
+  
     def move2goal_rvo(self,x,y):
         self.goal_pose = Odometry()
 
@@ -366,16 +325,23 @@ class TurtleBot:
         distance_tolerance = 0.2
 
         # Setting the direction and velocity
-        self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
-        self.set_heading(self.desired_heading)
-
-        self.vel_msg = Twist()
-        self.vel_msg.linear.x = 0.5
-        self.velocity_publisher.publish(self.vel_msg)
+        # self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
+        # self.set_heading(self.desired_heading)
+        rospy.sleep(0.1)
+        
+        # print("Pub 1,"+self.agent_name+" :"+str(self.desired_heading));
+        # print(self.odom.pose.pose.position)
 
         self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
         self.heading = self.desired_heading
-
+        print("Pub 1"+self.agent_name+" :"+str(self.heading))
+        print(self.odom.pose.pose.position)
+        self.vel_msg = Twist()
+        self.vel_msg.linear.x = 0.2
+        self.vel_msg.angular.z = self.heading
+        self.velocity_publisher.publish(self.vel_msg)
+        
+        
         while self.euclidean_distance(self.goal_pose) >= distance_tolerance:
             #self.vel_msg.linear.x = 0.5
             self.update_RVO(self.vel_msg.linear.x)
@@ -408,9 +374,14 @@ class TurtleBot:
                 else:
                     print("3")
                     self.heading = self.desired_heading
-                self.set_heading(self.heading)
-
+                print("Pub 3.1"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))    
+                self.set_heading(self.heading) 
+                print("Pub 3.2"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))   
+            self.vel_msg.angular.z = self.heading - self.theta;
+                # print("3:"+str(self.heading))
+                # exit(0)
             self.velocity_publisher.publish(self.vel_msg)
+            print("Pub 2");
             self.publish_to_information_channel(self.agent_name)
             self.prev_heading = self.heading
             print("-----")
@@ -418,43 +389,8 @@ class TurtleBot:
         # Stopping the agent after the movement is over.
         self.vel_msg.linear.x = 0
         self.velocity_publisher.publish(self.vel_msg)
-
+        print("Pub 3");
         # If we press control + C, the node will stop.
         #rospy.spin()
 
 
-# end
-#-----------------------------------------------------------------------------------------#
-
-#-----------------------------------------------------------------------------------------#
-# Testing functions
-    def wander(self,lin_vel,ang_vel):
-        """Moves the turtle to the goal."""
-        goal_pose = Odometry()
-
-        # Please, insert a number slightly greater than 0 (e.g. 0.01).
-        distance_tolerance = 1
-
-        while 1:
-            goal_pose.pose.pose.position.x = int(randint(0, 9))
-            goal_pose.pose.pose.position.y = int(randint(0, 9))
-
-            vel_msg = Twist()
-
-            # Linear velocity in the x-axis.
-            vel_msg.linear.x = lin_vel
-            vel_msg.linear.y = 0
-            vel_msg.linear.z = 0
-
-            # Angular velocity in the z-axis.
-            vel_msg.angular.x = 0
-            vel_msg.angular.y = 0
-            vel_msg.angular.z = ang_vel
-
-            # Publishing our vel_msg
-            self.velocity_publisher.publish(vel_msg)
-
-            # Publish at the desired rate.
-            self.rate.sleep()
-# end
-#-----------------------------------------------------------------------------------------#
