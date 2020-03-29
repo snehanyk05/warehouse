@@ -3,8 +3,6 @@
 
 import rospy
 from geometry_msgs.msg import Twist
-from turtlesim.msg import Pose
-from turtlesim.srv import TeleportAbsolute
 from tf.transformations import euler_from_quaternion
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
@@ -30,15 +28,8 @@ class TurtleBot:
         print(self.agent_name)
         rospy.init_node(self.agent_name)
 
-		### Publisher ###
-
-		# Publisher which will publish velocity to the topic '/turtleX/cmd_vel'.
+		
         self.velocity_publisher = rospy.Publisher('/'+self.agent_name+'/cmd_vel', Twist, queue_size=10)
-
-        # Publisher which will publish Pose to the topic '/turtleX/cmd_vel'.
-        # self.turtle_teleport = rospy.ServiceProxy(self.agent_name + '/teleport_absolute', TeleportAbsolute)
-
-        # Publisher which will publish to the topic '/common_information'
         self.publish_information = rospy.Publisher("/common_information", Information, queue_size=10)
 
         self.pub_pose = Odometry()
@@ -48,16 +39,120 @@ class TurtleBot:
 
         # self.update_pose is called when a message of type Pose is received.
         self.pose_subscriber = rospy.Subscriber('/'+self.agent_name+'/base_pose_ground_truth', Odometry, self.update_pose)
-
+        self.scan_subscriber = rospy.Subscriber('/'+self.agent_name+'/base_scan', LaserScan, self.clbk_laser)
         # self.recieve_from_information_channel is called when a message of type information is received.
         rospy.Subscriber("/common_information", Information, self.recieve_from_information_channel)
 
         self.odom = Odometry()
         self.theta = 0;
         self.rate = rospy.Rate(10)
-
+        self.state_description = 0
 #-----------------------------------------------------------------------------------------#
 # Functions related to topics
+    def clbk_laser(self, msg):
+    # print(msg)
+        regions = {
+            'right':  min(min(msg.ranges[0:143]), 10),
+            'fright': min(min(msg.ranges[144:287]), 10),
+            'front':  min(min(msg.ranges[288:431]), 10),
+            'fleft':  min(min(msg.ranges[432:575]), 10),
+            'left':   min(min(msg.ranges[576:719]), 10),
+        }
+        
+        self.take_action(regions)
+
+    def take_action(self, regions):
+        # msg = Twist()
+        linear_x = 0
+        angular_z = 0
+
+
+            # self.state_description = 'case 1 - nothing'
+            # state_description = 'case 2 - front'
+            # state_description = 'case 3 - fright'
+            # state_description = 'case 4 - fleft'
+            # state_description = 'case 5 - front and fright'
+            # state_description = 'case 6 - front and fleft'
+            # state_description = 'case 7 - front and fleft and fright'
+            # state_description = 'case 8 - fleft and fright'
+        
+        
+        if regions['front'] > 1 and regions['fleft'] > 1 and regions['fright'] > 1:
+            # 'case 1 - nothing'
+            self.state_description = 1
+        elif regions['front'] < 1 and regions['fleft'] > 1 and regions['fright'] > 1:
+            # 'case 2 - front'
+            self.state_description = 2
+        elif regions['front'] > 1 and regions['fleft'] > 1 and regions['fright'] < 1:
+            # 'case 3 - fright'
+            self.state_description = 3
+        elif regions['front'] > 1 and regions['fleft'] < 1 and regions['fright'] > 1:
+            # state_description = 'case 4 - fleft'
+            self.state_description = 4
+            linear_x = 0
+            angular_z = -0.3
+        elif regions['front'] < 1 and regions['fleft'] > 1 and regions['fright'] < 1:
+            # state_description = 'case 5 - front and fright'
+            self.state_description = 5
+        elif regions['front'] < 1 and regions['fleft'] < 1 and regions['fright'] > 1:
+            # front and fleft'
+            self.state_description = 6
+        elif regions['front'] < 1 and regions['fleft'] < 1 and regions['fright'] < 1:
+            # front and fleft and fright'
+            self.state_description = 7
+        elif regions['front'] > 1 and regions['fleft'] < 1 and regions['fright'] < 1:
+            # fleft and fright'
+            self.state_description = 8
+        else:
+            # state_description = 'unknown case'
+            self.state_description = 9
+            rospy.loginfo(regions)
+
+        # rospy.loginfo(state_description)
+
+        # self.vel_msg = Twist()
+        # self.vel_msg.linear.x = linear_x
+        # self.vel_msg.angular.z = angular_z
+        # self.velocity_publisher.publish(self.vel_msg)
+        # self..linear.x = linear_x
+        # msg.angular.z = angular_z
+        # self.velocity_publisher.publish(msg)
+    def state_velocities(self):
+        linear_x = 0
+        angular_z = 0
+        
+        if self.state_description == 1:
+            linear_x = 0
+            angular_z = 0
+        elif self.state_description == 2:
+            linear_x = 0
+            angular_z = 0.3
+        elif self.state_description == 3:
+            linear_x = 0
+            angular_z = 0.3
+        elif self.state_description == 4:
+            linear_x = 0
+            angular_z = -0.3
+        elif self.state_description == 5:
+            linear_x = 0
+            angular_z = 0.3
+        elif self.state_description == 6:
+            linear_x = 0
+            angular_z = -0.3
+        elif self.state_description == 7:
+            linear_x = 0
+            angular_z = 0.3
+        elif self.state_description == 8:
+            linear_x = 0.3
+            angular_z = 0
+        else: rospy.loginfo("Invalid")
+
+        self.vel_msg = Twist()
+        self.vel_msg.linear.x = linear_x
+        self.vel_msg.angular.z = angular_z
+
+
+
     def update_pose(self, data):
         """Callback function which is called when a new message of type Pose is
         received by the subscriber."""
@@ -107,16 +202,7 @@ class TurtleBot:
 
     # sets heading towards given direction
     def set_heading(self,theta):
-        #theta_rad = (theta * np.pi)/180
         rospy.sleep(0.1)
-        # print(theta)
-
-        # self.vel_msg = Twist()
-        # self.vel_msg.linear.x = self.odom.pose.pose.position.x
-        # self.vel_msg.linear.y = self.odom.pose.pose.position.y
-        # self.vel_msg.angular.z = theta
-        # self.velocity_publisher.publish(self.vel_msg)
-        # self.turtle_teleport(self.pose.x,self.pose.y,theta)
 
     # sets heading towards given co-ordinates
     def set_goal_heading(self,x,y):
@@ -323,14 +409,8 @@ class TurtleBot:
 
         # Please, insert a number slightly greater than 0 (e.g. 0.01).
         distance_tolerance = 0.2
-
-        # Setting the direction and velocity
-        # self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
-        # self.set_heading(self.desired_heading)
         rospy.sleep(0.1)
         
-        # print("Pub 1,"+self.agent_name+" :"+str(self.desired_heading));
-        # print(self.odom.pose.pose.position)
 
         self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
         self.heading = self.desired_heading
@@ -338,54 +418,56 @@ class TurtleBot:
         print(self.odom.pose.pose.position)
         self.vel_msg = Twist()
         self.vel_msg.linear.x = 0.2
-        self.vel_msg.angular.z = self.heading
+        self.vel_msg.angular.z = self.heading - self.theta
         self.velocity_publisher.publish(self.vel_msg)
         
         
         while self.euclidean_distance(self.goal_pose) >= distance_tolerance:
             #self.vel_msg.linear.x = 0.5
             self.update_RVO(self.vel_msg.linear.x)
-
-            if(self.collision() == True):
-                print("COLLLLLLISION")
-                #print("Inside RVO. Should choose new velocity")
-                #print("The new choosen velocity is : ")
-                #self.heading = self.choose_new_velocity_VO()
-                self.heading = self.choose_new_velocity_RVO()
-                if (self.best_min == None):
-                    #self.vel_msg.linear.x = self.penalize(self.vel_msg.linear.x)
-                    print("#########################################")
-                    self.heading = self.prev_heading
-                    #self.vel_msg.linear.x = 0.1
-                self.set_heading(self.heading)
-                #print(self.heading)
-                #print("---")
-                #self.heading = self.VO[]
-                #self.set_heading(self.heading)
-                #rospy.sleep(0.01)
-            else:
-                self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
-                if(self.in_RVO(self.desired_heading) == True):
-                    print("2")
-                    #print("desired heading still inside. Continue prev heading")
-                    #self.vel_msg.linear.x = 0
-                    #self.heading = self.prev_heading
+            if(self.state_description == 1):
+                if(self.collision() == True):
+                    print("COLLLLLLISION")
+                    #print("Inside RVO. Should choose new velocity")
+                    #print("The new choosen velocity is : ")
+                    #self.heading = self.choose_new_velocity_VO()
                     self.heading = self.choose_new_velocity_RVO()
+                    if (self.best_min == None):
+                        #self.vel_msg.linear.x = self.penalize(self.vel_msg.linear.x)
+                        print("#########################################")
+                        self.heading = self.prev_heading
+                        #self.vel_msg.linear.x = 0.1
+                    self.set_heading(self.heading)
+                    #print(self.heading)
+                    #print("---")
+                    #self.heading = self.VO[]
+                    #self.set_heading(self.heading)
+                    #rospy.sleep(0.01)
                 else:
-                    print("3")
-                    self.heading = self.desired_heading
-                print("Pub 3.1"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))    
-                self.set_heading(self.heading) 
-                print("Pub 3.2"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))   
-            self.vel_msg.angular.z = self.heading - self.theta;
+                    self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
+                    if(self.in_RVO(self.desired_heading) == True):
+                        print("2")
+                        #print("desired heading still inside. Continue prev heading")
+                        #self.vel_msg.linear.x = 0
+                        #self.heading = self.prev_heading
+                        self.heading = self.choose_new_velocity_RVO()
+                    else:
+                        print("3")
+                        self.heading = self.desired_heading
+                    print("Pub 3.1"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))    
+                    self.set_heading(self.heading) 
+                    print("Pub 3.2"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))   
+                self.vel_msg.angular.z = self.heading - self.theta;
                 # print("3:"+str(self.heading))
                 # exit(0)
+                
+            else:
+                self.state_velocities();
             self.velocity_publisher.publish(self.vel_msg)
             print("Pub 2");
             self.publish_to_information_channel(self.agent_name)
             self.prev_heading = self.heading
             print("-----")
-
         # Stopping the agent after the movement is over.
         self.vel_msg.linear.x = 0
         self.velocity_publisher.publish(self.vel_msg)
