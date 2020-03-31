@@ -4,12 +4,11 @@ import multiprocessing
 
 import rospy
 from geometry_msgs.msg import Twist
-from turtlesim.msg import Pose
 from math import pow, atan2, sqrt
 
 import numpy as np
 
-from turtle_instance import TurtleBot
+from turtle_instance_laser import TurtleBot
 
 k = 0
 sp_x = [1,9,1,9]
