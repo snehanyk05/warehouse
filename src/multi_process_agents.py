@@ -32,7 +32,7 @@ sp_x,sp_y,goal_x,goal_y = [None] * (user_input),[None] * (user_input),[None] * (
 
 #Equal distribution for start_point
 r = 5
-c = [5.5,5.5]
+c = [35.5,25.5]
 _angle = 2*(np.pi/(10))
 _pad_angle_sp = 0
 _pad_angle_goal = 0

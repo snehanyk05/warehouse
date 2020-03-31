@@ -6,7 +6,7 @@ from geometry_msgs.msg import Twist
 from tf.transformations import euler_from_quaternion
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
-
+import sys
 from std_msgs.msg import String
 from rvo.msg import Information
 
@@ -25,7 +25,7 @@ class TurtleBot:
     def __init__(self, agent_name):
 		# Creates a node with name of the agent
         self.agent_name = agent_name
-        print(self.agent_name)
+        # print(self.agent_name)
         rospy.init_node(self.agent_name)
 
 		
@@ -76,38 +76,44 @@ class TurtleBot:
             # state_description = 'case 6 - front and fleft'
             # state_description = 'case 7 - front and fleft and fright'
             # state_description = 'case 8 - fleft and fright'
-        
-        
-        if regions['front'] > 1 and regions['fleft'] > 1 and regions['fright'] > 1:
+           
+        if regions['front'] > 1 and regions['fleft'] > 1 and regions['fright'] > 1 and regions['right'] > 1 and regions['left'] > 1:
             # 'case 1 - nothing'
             self.state_description = 1
+        elif regions['right'] < 1:
+            # 'case 1 - nothing'
+            self.state_description = 2
+        elif regions['left'] < 1:
+            self.state_description = 3 
         elif regions['front'] < 1 and regions['fleft'] > 1 and regions['fright'] > 1:
             # 'case 2 - front'
-            self.state_description = 2
+            self.state_description = 4
         elif regions['front'] > 1 and regions['fleft'] > 1 and regions['fright'] < 1:
             # 'case 3 - fright'
-            self.state_description = 3
+            self.state_description = 5
         elif regions['front'] > 1 and regions['fleft'] < 1 and regions['fright'] > 1:
             # state_description = 'case 4 - fleft'
-            self.state_description = 4
+            self.state_description = 6
             linear_x = 0
             angular_z = -0.3
         elif regions['front'] < 1 and regions['fleft'] > 1 and regions['fright'] < 1:
             # state_description = 'case 5 - front and fright'
-            self.state_description = 5
+            self.state_description = 7
         elif regions['front'] < 1 and regions['fleft'] < 1 and regions['fright'] > 1:
             # front and fleft'
-            self.state_description = 6
+            self.state_description = 8
         elif regions['front'] < 1 and regions['fleft'] < 1 and regions['fright'] < 1:
             # front and fleft and fright'
-            self.state_description = 7
+            self.state_description = 9
         elif regions['front'] > 1 and regions['fleft'] < 1 and regions['fright'] < 1:
             # fleft and fright'
-            self.state_description = 8
+            self.state_description = 10
         else:
             # state_description = 'unknown case'
-            self.state_description = 9
-            rospy.loginfo(regions)
+            self.state_description = 11
+            print("UNNNNNKNOWNNN")
+        rospy.loginfo(self.agent_name+'; '+str(self.state_description)+":::::::")
+        rospy.loginfo(regions)
 
         # rospy.loginfo(state_description)
 
@@ -127,26 +133,38 @@ class TurtleBot:
             angular_z = 0
         elif self.state_description == 2:
             linear_x = 0
-            angular_z = 0.3
+            angular_z = 0.5
         elif self.state_description == 3:
             linear_x = 0
-            angular_z = 0.3
+            angular_z = -0.5
+
+
         elif self.state_description == 4:
             linear_x = 0
-            angular_z = -0.3
+            angular_z = 0.5
         elif self.state_description == 5:
             linear_x = 0
-            angular_z = 0.3
+            angular_z = 0.5
         elif self.state_description == 6:
             linear_x = 0
-            angular_z = -0.3
+            angular_z = -0.5
         elif self.state_description == 7:
             linear_x = 0
-            angular_z = 0.3
+            angular_z = 0.5
         elif self.state_description == 8:
-            linear_x = 0.3
+            linear_x = 0
+            angular_z = -0.5
+        elif self.state_description == 9:
+            linear_x = 0
+            angular_z = 0.5
+        elif self.state_description == 10:
+            linear_x = 0.5
             angular_z = 0
-        else: rospy.loginfo("Invalid")
+        else: 
+            rospy.loginfo("Invalid")
+            linear_x = 0
+            angular_z = -0.6
+            # exit(0)
 
         self.vel_msg = Twist()
         self.vel_msg.linear.x = linear_x
@@ -249,7 +267,7 @@ class TurtleBot:
         self.NR = 3
 
         self._least_distance = 10
-        print (self.all_agents_pose_dict)
+        # print (self.all_agents_pose_dict)
         for i in self.all_agents_pose_dict:
             if(i != self.agent_name):
                 #calc distance between agent and oher agent/obstacle
@@ -266,7 +284,7 @@ class TurtleBot:
                     self.point_to_agent_heading[i] = round(atan2((self.all_agents_pose_dict[i][1] - self.odom.pose.pose.position.y),(self.all_agents_pose_dict[i][0] - self.odom.pose.pose.position.x)),rr)
                     #can also use np.clip
                     try:
-                        print("DIST "+self.agent_name ,self._distance)
+                        # print("DIST "+self.agent_name ,self._distance)
                         self._omega[i] = round(asin(r/self._distance),rr)
                     except ValueError:
                         self._omega[i] = round(np.pi/2,rr)
@@ -285,8 +303,8 @@ class TurtleBot:
                         temp = abs(v_mag * (cos(self.theta) - cos(self.all_agents_pose_dict[i][2])))
                         if temp != 0:
                             self.time_to_collision[i] = abs(self.all_agents_pose_dict[i][0] - self.odom.pose.pose.position.x)/temp
-                        else:
-                            exit(0)
+                        
+                            
 
                     #Instead of checking if v_A is in VO, im checking if v_AB is inside something called "VX"
                     #But for RVO, we are adding v_A and v_B to VX.
@@ -331,7 +349,7 @@ class TurtleBot:
 
         #Find the nearest heading that is outside the VO
         self.temp_array_marginals = np.array([])
-        print(self.VO)
+        # print(self.VO)
         for i in self.VO:
             self.temp_array_marginals = np.append(self.temp_array_marginals, self.VO[i])
             #self.temp_temp_temp = self.VO[i][0]
@@ -342,16 +360,16 @@ class TurtleBot:
                 while(k <= np.round(self._h[i+1],2)):
                     self._headings_array = np.delete(self._headings_array, np.where(self._headings_array == np.round(k,2)))
                     k+=0.01
-        print("===")
-        print("RVO is :")
-        print(self._h)
+        # print("===")
+        # print("RVO is :")
+        # print(self._h)
         self.idx = np.abs(self._headings_array - self.desired_heading -0.1).argmin()
         self.best_min = self._headings_array[self.idx]
-        print("desired heading :")
-        print(self.desired_heading)
-        print("choosen direction is")
-        print(self.best_min)
-        print("===")
+        # print("desired heading :")
+        # print(self.desired_heading)
+        # print("choosen direction is")
+        # print(self.best_min)
+        # print("===")
         #rospy.sleep(1)
         return self.best_min
 
@@ -388,14 +406,14 @@ class TurtleBot:
         #self.idx = (np.abs(self._headings_array - self.desired_heading) + 0.01/(self._min_time_collision+0.0001)).argmin()
         # choose whether left or right side is the nearest and then assign
         self.best_min = self._headings_array[(self.idx-1)%len(self._headings_array)]
-        print("RVO is :")
-        print(self._h)
-        print("===")
-        print("desired heading :")
-        print(self.desired_heading)
-        print("choosen direction is")
-        print(self.best_min)
-        print("===")
+        # print("RVO is :")
+        # print(self._h)
+        # print("===")
+        # print("desired heading :")
+        # print(self.desired_heading)
+        # print("choosen direction is")
+        # print(self.best_min)
+        # print("===")
         #rospy.sleep(1)
         #####then return a velocity that is average of current velocity and a velocity outside VO nearer to current heading
         return self.best_min
@@ -420,8 +438,8 @@ class TurtleBot:
 
         self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
         self.heading = self.desired_heading
-        print("Pub 1"+self.agent_name+" :"+str(self.heading))
-        print(self.odom.pose.pose.position)
+        # print("Pub 1"+self.agent_name+" :"+str(self.heading))
+        # print(self.odom.pose.pose.position)
         self.vel_msg = Twist()
         self.vel_msg.linear.x = 0.2
         self.vel_msg.angular.z = self.heading - self.theta
@@ -433,14 +451,14 @@ class TurtleBot:
             self.update_RVO(self.vel_msg.linear.x)
             if(self.state_description == 1):
                 if(self.collision() == True):
-                    print("COLLLLLLISION")
+                    # print("COLLLLLLISION")
                     #print("Inside RVO. Should choose new velocity")
                     #print("The new choosen velocity is : ")
                     #self.heading = self.choose_new_velocity_VO()
                     self.heading = self.choose_new_velocity_RVO()
                     if (self.best_min == None):
                         #self.vel_msg.linear.x = self.penalize(self.vel_msg.linear.x)
-                        print("#########################################")
+                        # print("#########################################")
                         self.heading = self.prev_heading
                         #self.vel_msg.linear.x = 0.1
                     self.set_heading(self.heading)
@@ -452,17 +470,17 @@ class TurtleBot:
                 else:
                     self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
                     if(self.in_RVO(self.desired_heading) == True):
-                        print("2")
+                        # print("2")
                         #print("desired heading still inside. Continue prev heading")
                         #self.vel_msg.linear.x = 0
                         #self.heading = self.prev_heading
                         self.heading = self.choose_new_velocity_RVO()
                     else:
-                        print("3")
+                        # print("3")
                         self.heading = self.desired_heading
-                    print("Pub 3.1"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))    
+                    # print("Pub 3.1"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))    
                     self.set_heading(self.heading) 
-                    print("Pub 3.2"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))   
+                    # print("Pub 3.2"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))   
                 self.vel_msg.angular.z = self.heading - self.theta;
                 # print("3:"+str(self.heading))
                 # exit(0)
@@ -470,10 +488,10 @@ class TurtleBot:
             else:
                 self.state_velocities();
             self.velocity_publisher.publish(self.vel_msg)
-            print("Pub 2");
+            # print("Pub 2");
             self.publish_to_information_channel(self.agent_name)
             self.prev_heading = self.heading
-            print("-----")
+            # print("-----")
         # Stopping the agent after the movement is over.
         self.vel_msg.linear.x = 0
         self.velocity_publisher.publish(self.vel_msg)
