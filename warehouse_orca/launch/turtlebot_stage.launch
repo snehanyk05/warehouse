@@ -1,0 +1,44 @@
+<!-- 
+  Turtlebot navigation simulation:
+  - stage
+  - map_server
+  - move_base
+  - static map
+  - amcl
+  - rviz view
+ -->
+<!-- <launch>
+
+  <node pkg="stage_ros" type="stageros" name="stageros" args="$(find dwa)/stage/AddverbMap.world">
+    
+  </node>
+
+</launch> -->
+<!-- 
+  Turtlebot navigation simulation:
+  - stage
+  - map_server
+  - move_base
+  - static map
+  - amcl
+  - rviz view
+ -->
+<launch>
+  
+  <arg name="world_file"    default="$(find warehouse_orca)/stage/AddverbMap.world" />
+
+  <node pkg="stage_ros" type="stageros" name="stageros" args="$(arg world_file)">
+  </node>
+
+<!-- 
+  <node pkg="map_server" name="map_server" type="map_server" args="$(find warehouse_orca)/stage/AddverbMap.yaml"/>
+  <include file="$(find astar)/launch/astar.launch">
+    <arg name="robot" value="robot_0"/>
+  </include>
+  <include file="$(find astar)/launch/astar.launch">
+    <arg name="robot" value="robot_1"/>
+  </include>
+
+<node pkg="rviz" type="rviz" name="rviz" args="-d $(find astar)/rviz/astar.rviz"/> -->
+
+</launch>

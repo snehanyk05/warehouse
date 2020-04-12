@@ -1,0 +1,17 @@
+<!-- -*- mode: XML -*- -->
+<launch>
+<arg name="robot" />
+    ################ map server ################
+
+    ################ start astar node ################
+    <node pkg="astar" type="astar" name="astar" output="screen" ns="$(arg robot)">
+        <param name="Euclidean" value="true"/>
+        <param name="OccupyThresh" value="-1"/>
+        <param name="InflateRadius" value="0.25"/>
+        <param name="rate" value="10"/>
+        <remap from="/$(arg robot)/map" to="/map"/>
+    </node>
+
+    ################ start rviz ################
+
+</launch>
