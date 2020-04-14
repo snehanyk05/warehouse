@@ -18,6 +18,6 @@ There are 4 files in the src folder other than multi_process_agents.py
 1. turtle_instance.py (without laser)
 2. turtle_instance_laser.py 
 3. turtle_instance_astar.py (global planning)
-4. turtle_instance_astar_laser.py( with astar and lidar)
+4. turtle_instance_laser_astar.py( with astar and lidar)
 
 You can switch these file in multi_process_agents.py, by default it is turtle_instance_laser.py 
