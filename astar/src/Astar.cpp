@@ -22,9 +22,9 @@ void Astar::InitAstar(Mat& _Map, Mat& Mask, AstarConfig _config)
 
     Map = _Map;
     config = _config;
-    cout<<("IN Before!\n");
+   
     neighbor = Mat(8, 2, CV_8S, neighbor8).clone();
-ROS_INFO("IN After!\n");
+
     MapProcess(Mask);
 }
 

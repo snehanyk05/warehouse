@@ -311,6 +311,36 @@ class TurtleBot:
 
 #-----------------------------------------------------------------------------------------#
 # RVO functions
+      def goalServiceRequest(self):
+        rospy.wait_for_service('request_available_task')
+        #print("Service available for ", name)
+        try:
+            goalCoord = rospy.ServiceProxy('request_available_task',Robot_Task_Request)
+            x = self.agent_name.split("_")
+
+            response = goalCoord(x[1])
+            return response
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+
+    def goalCompleteRequest(self, name, time, distance):
+        rospy.wait_for_service('report_task_complete')
+        try:
+            goalComplete = rospy.ServiceProxy('report_task_complete',Robot_Task_Complete)
+            response = goalComplete(name, time, distance)
+            return response
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+
+    def requestTasks(self):
+        result = self.goalServiceRequest()
+        if(result.task_available == True):
+            time = self.move2goal_rvo(result.x,result.y)
+            x = self.agent_name.split("_")
+            self.goalCompleteRequest(x[1],time,0)
+            self.requestTasks()
+        else:
+            print("Request Failed")
   
     def move2goal_rvo(self,x,y):
         self.start_time = time.time()

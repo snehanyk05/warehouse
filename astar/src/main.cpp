@@ -42,7 +42,7 @@ int rate;
 //-------------------------------- Callback function ---------------------------------//
 void MapCallback(const nav_msgs::OccupancyGrid& msg)
 {
-    ROS_INFO("IN MAP!\n");
+   
     // Get parameter
     OccGridParam.GetOccupancyGridParam(msg);
 
