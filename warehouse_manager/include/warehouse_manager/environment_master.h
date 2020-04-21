@@ -4,8 +4,10 @@
 #include "ros/ros.h"
 #include "warehouse_manager/Robot_Task_Complete.h"
 #include "warehouse_manager/Robot_Task_Request.h"
+#include "warehouse_manager/Robot_Gen_Report.h"
 #include "warehouse_manager/TaskInfo.h"
 #include "warehouse_manager/RobotInfo.h"
+#include <std_msgs/Int32.h>
 #include <iostream>
 #include <stdio.h>
 #include <tuple>
@@ -22,9 +24,12 @@ private:
 public:
   ros::ServiceServer report_task_completion;
   ros::ServiceServer request_available_task;
+  ros::ServiceServer request_all_task_complete;
+  ros::Subscriber collision_sub;
   
   int robot_number_;
   int robot_count_;
+  int num_collisions_;
   EnvironmentMaster();
   
   EnvironmentMaster(ros::NodeHandle nh) { this->n_ = nh; }
@@ -36,6 +41,11 @@ public:
 
   bool req_task(warehouse_manager::Robot_Task_Request::Request &req,
                      warehouse_manager::Robot_Task_Request::Response &res);
+
+  bool all_task_complete(warehouse_manager::Robot_Gen_Report::Request &req,
+                     warehouse_manager::Robot_Gen_Report::Response &res);
+
+  void collisionCallback(const std_msgs::Int32::ConstPtr& msg);
 
   void add_to_report(int robot_number);
 

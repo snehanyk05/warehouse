@@ -1,26 +1,175 @@
 
 
+Task: 0 Robot: 4 Time: 54.2104 Distance: 0
+Task: 1 Robot: 4 Time: 53.4555 Distance: 0
+Task: 2 Robot: 4 Time: 386.323 Distance: 0
+Task: 3 Robot: 4 Time: 13.4501 Distance: 0
+Task: 4 Robot: 4 Time: 45.6884 Distance: 0
+Task: 5 Robot: 4 Time: 500.092 Distance: 0
+Task: 6 Robot: 4 Time: 94.404 Distance: 0
+Task: 7 Robot: 4 Time: 85.2105 Distance: 0
+Task: 8 Robot: 4 Time: 162.078 Distance: 0
+Task: 9 Robot: 4 Time: 500.05 Distance: 0
 
 
+Task: 0 Robot: 3 Time: 202.209 Distance: 0
+Task: 1 Robot: 3 Time: 42.5042 Distance: 0
+Task: 2 Robot: 3 Time: 319.478 Distance: 0
+Task: 3 Robot: 3 Time: 500.016 Distance: 0
+Task: 4 Robot: 3 Time: 437.809 Distance: 0
+Task: 5 Robot: 3 Time: 11.9006 Distance: 0
+Task: 6 Robot: 3 Time: 59.8941 Distance: 0
+Task: 7 Robot: 3 Time: 500.008 Distance: 0
+Task: 8 Robot: 3 Time: 102.755 Distance: 0
+Task: 9 Robot: 3 Time: 64.4397 Distance: 0
 
 
+Task: 0 Robot: 1 Time: 70.3602 Distance: 0
+Task: 1 Robot: 1 Time: 33.1226 Distance: 0
+Task: 2 Robot: 1 Time: 118.98 Distance: 0
+Task: 3 Robot: 1 Time: 62.3944 Distance: 0
+Task: 4 Robot: 1 Time: 8.71558 Distance: 0
+Task: 5 Robot: 1 Time: 500.19 Distance: 0
+Task: 6 Robot: 1 Time: 500.077 Distance: 0
+Task: 7 Robot: 1 Time: 500.148 Distance: 0
+Task: 8 Robot: 1 Time: 500.094 Distance: 0
+Task: 9 Robot: 1 Time: 141.955 Distance: 0
 
 
+Task: 0 Robot: 9 Time: 79.6516 Distance: 0
+Task: 1 Robot: 9 Time: 104.099 Distance: 0
+Task: 2 Robot: 9 Time: 65.0049 Distance: 0
+Task: 3 Robot: 9 Time: 500.149 Distance: 0
+Task: 4 Robot: 9 Time: 9.72529 Distance: 0
+Task: 5 Robot: 9 Time: 319.378 Distance: 0
+Task: 6 Robot: 9 Time: 52.5887 Distance: 0
+Task: 7 Robot: 9 Time: 271.181 Distance: 0
+Task: 8 Robot: 9 Time: 11.5512 Distance: 0
+Task: 9 Robot: 9 Time: 77.9662 Distance: 0
 
 
+Task: 0 Robot: 7 Time: 58.5459 Distance: 0
+Task: 1 Robot: 7 Time: 249.315 Distance: 0
+Task: 2 Robot: 7 Time: 500.01 Distance: 0
+Task: 3 Robot: 7 Time: 32.5773 Distance: 0
+Task: 4 Robot: 7 Time: 57.3895 Distance: 0
+Task: 5 Robot: 7 Time: 94.8073 Distance: 0
+Task: 6 Robot: 7 Time: 35.4905 Distance: 0
+Task: 7 Robot: 7 Time: 37.4814 Distance: 0
+Task: 8 Robot: 7 Time: 226.32 Distance: 0
+Task: 9 Robot: 7 Time: 318.748 Distance: 0
 
 
+Task: 0 Robot: 8 Time: 70.6542 Distance: 0
+Task: 1 Robot: 8 Time: 70.3018 Distance: 0
+Task: 2 Robot: 8 Time: 498.326 Distance: 0
+Task: 3 Robot: 8 Time: 431.001 Distance: 0
+Task: 4 Robot: 8 Time: 76.2772 Distance: 0
+Task: 5 Robot: 8 Time: 21.1025 Distance: 0
+Task: 6 Robot: 8 Time: 138.899 Distance: 0
+Task: 7 Robot: 8 Time: 109.409 Distance: 0
+Task: 8 Robot: 8 Time: 500.131 Distance: 0
+Task: 9 Robot: 8 Time: 12.6932 Distance: 0
 
 
+Task: 0 Robot: 0 Time: 69.964 Distance: 0
+Task: 1 Robot: 0 Time: 142.864 Distance: 0
+Task: 2 Robot: 0 Time: 500.15 Distance: 0
+Task: 3 Robot: 0 Time: 500.186 Distance: 0
+Task: 4 Robot: 0 Time: 49.353 Distance: 0
+Task: 5 Robot: 0 Time: 4.45465 Distance: 0
+Task: 6 Robot: 0 Time: 318.996 Distance: 0
+Task: 7 Robot: 0 Time: 39.4722 Distance: 0
+Task: 8 Robot: 0 Time: 395.257 Distance: 0
+Task: 9 Robot: 0 Time: 33.5153 Distance: 0
 
 
+Task: 0 Robot: 1 Time: 97.146 Distance: 0
+Task: 1 Robot: 1 Time: 33.4878 Distance: 0
+Task: 2 Robot: 1 Time: 136.92 Distance: 0
+Task: 3 Robot: 1 Time: 88.1644 Distance: 0
+Task: 4 Robot: 1 Time: 8.71871 Distance: 0
+Task: 5 Robot: 1 Time: 477.107 Distance: 0
+Task: 6 Robot: 1 Time: 98.4395 Distance: 0
+Task: 7 Robot: 1 Time: 500.128 Distance: 0
+Task: 8 Robot: 1 Time: 500.083 Distance: 0
+Task: 9 Robot: 1 Time: 143.608 Distance: 0
 
 
+Task: 0 Robot: 2 Time: 102.815 Distance: 0
+Task: 1 Robot: 2 Time: 65.8106 Distance: 0
+Task: 2 Robot: 2 Time: 500.157 Distance: 0
+Task: 3 Robot: 2 Time: 500.091 Distance: 0
+Task: 4 Robot: 2 Time: 500.199 Distance: 0
+Task: 5 Robot: 2 Time: 17.7075 Distance: 0
+Task: 6 Robot: 2 Time: 500.092 Distance: 0
+Task: 7 Robot: 2 Time: 73.1552 Distance: 0
+Task: 8 Robot: 2 Time: 56.5364 Distance: 0
+Task: 9 Robot: 2 Time: 24.9235 Distance: 0
 
 
+Task: 0 Robot: 4 Time: 57.1268 Distance: 0
+Task: 1 Robot: 4 Time: 53.0296 Distance: 0
+Task: 2 Robot: 4 Time: 500.165 Distance: 0
+Task: 3 Robot: 4 Time: 11.4363 Distance: 0
+Task: 4 Robot: 4 Time: 44.7435 Distance: 0
+Task: 5 Robot: 4 Time: 500.096 Distance: 0
+Task: 6 Robot: 4 Time: 157.166 Distance: 0
+Task: 7 Robot: 4 Time: 85.5595 Distance: 0
+Task: 8 Robot: 4 Time: 500.164 Distance: 0
+Task: 9 Robot: 4 Time: 500.195 Distance: 0
 
 
+Task: 0 Robot: 3 Time: 197.806 Distance: 0
+Task: 1 Robot: 3 Time: 42.506 Distance: 0
+Task: 2 Robot: 3 Time: 265.655 Distance: 0
+Task: 3 Robot: 3 Time: 500.102 Distance: 0
+Task: 4 Robot: 3 Time: 500.16 Distance: 0
+Task: 5 Robot: 3 Time: 369.629 Distance: 0
+Task: 6 Robot: 3 Time: 58.4903 Distance: 0
+Task: 7 Robot: 3 Time: 500.173 Distance: 0
+Task: 8 Robot: 3 Time: 54.4942 Distance: 0
+Task: 9 Robot: 3 Time: 34.5217 Distance: 0
 
 
+Task: 0 Robot: 6 Time: 500.079 Distance: 0
+Task: 1 Robot: 6 Time: 72.7097 Distance: 0
+Task: 2 Robot: 6 Time: 500.089 Distance: 0
+Task: 3 Robot: 6 Time: 500.168 Distance: 0
+Task: 4 Robot: 6 Time: 500.127 Distance: 0
+Task: 5 Robot: 6 Time: 16.7003 Distance: 0
+Task: 6 Robot: 6 Time: 272.07 Distance: 0
+Task: 7 Robot: 6 Time: 48.7331 Distance: 0
+Task: 8 Robot: 6 Time: 331.064 Distance: 0
+Task: 9 Robot: 6 Time: 15.9235 Distance: 0
 
 
+Task: 0 Robot: 5 Time: 500.064 Distance: 0
+Task: 1 Robot: 5 Time: 169.603 Distance: 0
+Task: 2 Robot: 5 Time: 50.2697 Distance: 0
+Task: 3 Robot: 5 Time: 383.343 Distance: 0
+Task: 4 Robot: 5 Time: 207.108 Distance: 0
+Task: 5 Robot: 5 Time: 396.074 Distance: 0
+Task: 6 Robot: 5 Time: 500.005 Distance: 0
+Task: 7 Robot: 5 Time: 158.761 Distance: 0
+Task: 8 Robot: 5 Time: 428.029 Distance: 0
+Task: 9 Robot: 5 Time: 142.579 Distance: 0
+
+
+Time and distance: 
+Robot: 10 Time: 0 Distance: -nan
+Robot: 9 Time: 1491.29 Distance: -nan
+Robot: 8 Time: 3420.09 Distance: -nan
+Robot: 7 Time: 5030.77 Distance: -nan
+Robot: 6 Time: 7788.44 Distance: -nan
+Robot: 5 Time: 10724.3 Distance: -nan
+Robot: 4 Time: 13134 Distance: -nan
+Robot: 3 Time: 15657.5 Distance: -nan
+Robot: 2 Time: 17999 Distance: -nan
+Robot: 1 Time: 20082.8 Distance: -nan
+Robot: 0 Time: 22137 Distance: -nan
+
+
+Total-  Time: 117465 Distance: -nan
+
+Total number of collisions: 33

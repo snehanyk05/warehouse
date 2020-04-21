@@ -70,6 +70,7 @@ add_service_files(
    FILES
    Robot_Task_Complete.srv
    Robot_Task_Request.srv
+   Robot_Gen_Report.srv
 )
 
 ## Generate actions in the 'action' folder

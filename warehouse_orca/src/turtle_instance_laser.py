@@ -95,35 +95,35 @@ class TurtleBot:
         #                 if(regions['right'] > 1):
         #                     print("In here right")
             
-        if regions['front'] >= 1 and regions['fleft'] >= 1 and regions['fright'] >= 1 and regions['right'] >= 1 and regions['left'] >= 1:
+        if regions['front'] >= 0.5 and regions['fleft'] >= 0.5 and regions['fright'] >= 0.5 and regions['right'] >= 0.5 and regions['left'] >= 0.5:
             # 'case 1 - nothing'
             self.state_description = 1
-        elif regions['right'] <= 1:
+        elif regions['right'] <= 0.5:
             # 'case 1 - nothing'
             self.state_description = 2
-        elif regions['left'] <= 1:
+        elif regions['left'] <= 0.5:
             self.state_description = 3 
-        elif regions['front'] <= 1 and regions['fleft'] >= 1 and regions['fright'] >= 1:
+        elif regions['front'] <= 0.5 and regions['fleft'] >= 0.5 and regions['fright'] >= 0.5:
             # 'case 2 - front'
             self.state_description = 4
-        elif regions['front'] >= 1 and regions['fleft'] >= 1 and regions['fright'] <= 1:
+        elif regions['front'] >= 0.5 and regions['fleft'] >= 0.5 and regions['fright'] <= 0.5:
             # 'case 3 - fright'
             self.state_description = 5
-        elif regions['front'] >= 1 and regions['fleft'] <= 1 and regions['fright'] >= 1:
+        elif regions['front'] >= 0.5 and regions['fleft'] <= 0.5 and regions['fright'] >= 0.5:
             # state_description = 'case 4 - fleft'
             self.state_description = 6
             linear_x = 0
             angular_z = -0.3
-        elif regions['front'] <= 1 and regions['fleft'] >= 1 and regions['fright'] <= 1:
+        elif regions['front'] <= 0.5 and regions['fleft'] >= 0.5 and regions['fright'] <= 0.5:
             # state_description = 'case 5 - front and fright'
             self.state_description = 7
-        elif regions['front'] <= 1 and regions['fleft'] <= 1 and regions['fright'] >= 1:
+        elif regions['front'] <= 0.5 and regions['fleft'] <= 0.5 and regions['fright'] >= 0.5:
             # front and fleft'
             self.state_description = 8
-        elif regions['front'] <= 1 and regions['fleft'] <= 1 and regions['fright'] <= 1:
+        elif regions['front'] <= 0.5 and regions['fleft'] <= 0.5 and regions['fright'] <= 0.5:
             # front and fleft and fright'
             self.state_description = 9
-        elif regions['front'] >= 1 and regions['fleft'] <= 1 and regions['fright'] <= 1:
+        elif regions['front'] >= 0.5 and regions['fleft'] <= 0.5 and regions['fright'] <= 0.5:
             # fleft and fright'
             self.state_description = 10
         else:
@@ -522,7 +522,7 @@ class TurtleBot:
         self.velocity_publisher.publish(self.vel_msg)
         
         
-        while self.euclidean_distance(self.goal_pose) >= distance_tolerance:
+        while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<500)) :
             #self.vel_msg.linear.x = 0.5
             self.update_RVO(self.vel_msg.linear.x)
             if(self.state_description == 1):
