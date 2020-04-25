@@ -652,7 +652,10 @@ class TurtleBot:
                 self.prev_heading = self.heading
                 # print("EU dis ")
                 if(self.euclidean_distance_pose(poses[i])<5):
-                    i += 1
+                    if( i >= len(self.nav_path.poses) - 1):
+                        i = len(self.nav_path.poses) - 1
+                    else:
+                        i += 10
 
 
             if self.euclidean_distance(self.goal_pose) < distance_tolerance:

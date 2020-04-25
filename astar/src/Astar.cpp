@@ -79,13 +79,15 @@ ROS_INFO("IN After!\n");
     Mat src = _Map.clone();
     if(config.InflateRadius > 0)
     {
-        Mat se = getStructuringElement(MORPH_ELLIPSE, Size(2 * config.InflateRadius, 2 * config.InflateRadius));
-        erode(src, _Map, se);
+        Mat se = getStructuringElement(MORPH_RECT, Size(2 * config.InflateRadius, 2 * config.InflateRadius));
+        erode(src, _Map, se, Point(-1, -1), 6);
     }
 
     // Get mask
     bitwise_xor(src, _Map, Mask);
-
+    //imshow("Mask", Mask);
+    //waitKey(0);
+    //destroyAllWindows();
     // Initial LabelMap
     ROS_INFO("IN Bfter!\n");
     LabelMap = Mat::zeros(height, width, CV_8UC1);
