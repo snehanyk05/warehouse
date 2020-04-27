@@ -27,6 +27,8 @@ public:
   ros::ServiceServer request_all_task_complete;
   ros::Subscriber collision_sub;
   
+  double begin_;
+  double end_;
   int robot_number_;
   int robot_count_;
   int num_collisions_;

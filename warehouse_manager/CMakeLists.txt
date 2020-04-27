@@ -7,7 +7,6 @@ add_compile_options(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(PCL REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
@@ -17,8 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
   tf
-  pcl_conversions
-  pcl_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -131,7 +128,6 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -163,7 +159,6 @@ add_dependencies(warehouse_master ${PROJECT_NAME}_generate_messages_cpp)
 target_link_libraries(
  warehouse_master
  ${catkin_LIBRARIES}
- ${PCL_LIBRARY_DIRS}
 )
 
 #############

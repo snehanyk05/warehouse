@@ -8,7 +8,7 @@ from math import pow, atan2, sqrt
 
 import numpy as np
 
-from turtle_instance_laser_astar import TurtleBot
+from turtle_instance_laser import TurtleBot
 
 k = 0
 sp_x = [1,9,1,9]

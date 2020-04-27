@@ -57,6 +57,7 @@ void EnvironmentMaster::init() {
   request_all_task_complete = this->n_.advertiseService("gen_final_report", &EnvironmentMaster::all_task_complete, this);
 
   collision_sub = this->n_.subscribe("/collisions", 10, &EnvironmentMaster::collisionCallback, this);
+  begin_ = ros::Time::now().toSec();
 }
 
 void EnvironmentMaster::collisionCallback(const std_msgs::Int32::ConstPtr& msg)
@@ -144,12 +145,16 @@ bool EnvironmentMaster::all_task_complete(warehouse_manager::Robot_Gen_Report::R
      one_robot_distance += robot_distance_[temp_num][i]; 
    }
    outfile << "Robot: " << temp_num << " Time: " << one_robot_time << " Distance: " << one_robot_distance << "\n";
-   total_time += one_robot_time;
-   total_distance += one_robot_distance;  
+   if(robot_time_[temp_num].size() > 0){
+      total_time += (one_robot_time/robot_time_[temp_num].size());
+      total_distance += (one_robot_distance/robot_time_[temp_num].size());  
+    }  
    temp_num--;
  }
  outfile << "\n" << "\n";
- outfile << "Total- "  << " Time: " << total_time << " Distance: " << total_distance << "\n" ;
+ double diff_now = ros::Time::now().toSec() - begin_;
+ outfile << "Total(1/Tasks)- "  << " Time: " << total_time << " Distance: " << total_distance << "\n";
+ outfile << "Total Time(For all tasks)- " << diff_now << "\n"; 
  //Print the number of collisions
  //boost::shared_ptr<std_msgs::Int32 const> shared_count;
  //std_msgs::Int32 col_count;
@@ -178,6 +183,9 @@ void EnvironmentMaster::add_to_report(int robot_number)
   }
   else
   {
+    // Warehouse time
+    end_ = ros::Time::now().toSec();
+    double diff = end_ - begin_; 
     //Adding total time and total distance
     outfile << "\n" << "\n";
     outfile << "Time and distance: " << "\n";
@@ -194,13 +202,15 @@ void EnvironmentMaster::add_to_report(int robot_number)
         one_robot_distance += robot_distance_[temp_num][i]; 
       }
       outfile << "Robot: " << temp_num << " Time: " << one_robot_time << " Distance: " << one_robot_distance << "\n";
-      total_time += one_robot_time;
-      total_distance += one_robot_distance;  
+      if(robot_time_[temp_num].size() > 0){
+        total_time += (one_robot_time/robot_time_[temp_num].size());
+        total_distance += (one_robot_distance/robot_time_[temp_num].size());  
+      }
       temp_num  --;
     }
     outfile << "\n" << "\n";
-    outfile << "Total- "  << " Time: " << total_time << " Distance: " << total_distance << "\n";
-
+    outfile << "Total(1/Tasks)- "  << " Time: " << total_time << " Distance: " << total_distance << "\n";
+    outfile << "Total Time(For all tasks)- " << diff << "\n";
     //Print the number of collisions
     //boost::shared_ptr<std_msgs::Int32 const> shared_count;
     //std_msgs::Int32 col_count;
