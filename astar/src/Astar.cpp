@@ -59,7 +59,7 @@ void Astar::MapProcess(Mat& Mask)
     int width = Map.cols;
     int height = Map.rows;
     Mat _Map = Map.clone();
-ROS_INFO("IN Before!\n");
+// ROS_INFO("IN Before!\n");
     // Transform RGB to gray image
     if(_Map.channels() == 3)
     {
@@ -74,7 +74,7 @@ ROS_INFO("IN Before!\n");
     {
         threshold(_Map.clone(), _Map, config.OccupyThresh, 255, CV_THRESH_BINARY);
     }
-ROS_INFO("IN After!\n");
+// ROS_INFO("IN After!\n");
     // Inflate
     Mat src = _Map.clone();
     if(config.InflateRadius > 0)
@@ -89,7 +89,7 @@ ROS_INFO("IN After!\n");
     //waitKey(0);
     //destroyAllWindows();
     // Initial LabelMap
-    ROS_INFO("IN Bfter!\n");
+    // ROS_INFO("IN Bfter!\n");
     LabelMap = Mat::zeros(height, width, CV_8UC1);
     for(int y=0;y<height;y++)
     {
@@ -105,7 +105,7 @@ ROS_INFO("IN After!\n");
             }
         }
     }
-    ROS_INFO("IN After!\n");
+    // ROS_INFO("IN After!\n");
 }
 
 Node* Astar::FindPath()

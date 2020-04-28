@@ -8,7 +8,7 @@
 void OccupancyGridParam::GetOccupancyGridParam(nav_msgs::OccupancyGrid OccGrid)
 {
     // Get parameter
-    ROS_INFO("IN After!\n");
+    // ROS_INFO("IN After!\n");
     resolution = OccGrid.info.resolution;
     height = OccGrid.info.height;
     width = OccGrid.info.width;
@@ -23,21 +23,21 @@ void OccupancyGridParam::GetOccupancyGridParam(nav_msgs::OccupancyGrid OccGrid)
 
     // Calculate R, t
     R = Mat::zeros(2,2, CV_64FC1);
-    ROS_INFO("IN After!\n");
+    // ROS_INFO("IN After!\n");
     R.at<double>(0, 0) = resolution * cos(theta);
     R.at<double>(0, 1) = resolution * sin(-theta);
     R.at<double>(1, 0) = resolution * sin(theta);
     R.at<double>(1, 1) = resolution * cos(theta);
     t = Mat(Vec2d(x, y), CV_64FC1);
-    ROS_INFO("IN After!\n");
+    // ROS_INFO("IN After!\n");
 }
 
 void OccupancyGridParam::Image2MapTransform(Point& src_point, Point2d& dst_point)
 {
-    ROS_INFO("IN After!\n");
+    // ROS_INFO("IN After!\n");
     // Upside down
     Mat P_src = Mat(Vec2d(src_point.x, height - 1 - src_point.y), CV_64FC1);
-    ROS_INFO("IN After!\n");
+    // ROS_INFO("IN After!\n");
     // Rotate and translate
     Mat P_dst = R * P_src + t;
 
@@ -47,7 +47,7 @@ void OccupancyGridParam::Image2MapTransform(Point& src_point, Point2d& dst_point
 
 void OccupancyGridParam::Map2ImageTransform(Point2d& src_point, Point& dst_point)
 {
-    ROS_INFO("Here in occuppancy");
+    // ROS_INFO("Here in occuppancy");
     cout<<R;
     Mat P_src = Mat(Vec2d(src_point.x, src_point.y), CV_64FC1);
     // Rotate and translate
