@@ -101,34 +101,34 @@ class TurtleBot:
         #                 if(regions['right'] > 1):
         #                     print("In here right")
             
-        if regions['front'] >= 1 and regions['fleft'] >= 1 and regions['fright'] >= 1 and regions['right'] >= 1 and regions['left'] >= 1:
+        if regions['front'] >= 0.85 and regions['fleft'] >= 0.85 and regions['fright'] >= 0.85 and regions['right'] >= 0.85 and regions['left'] >= 0.85:
             # print('case 1 - nothing')
             self.state_description = 1
-        elif regions['right'] <= 1:
+        elif regions['right'] <= 0.85:
             # print('case 2 - right')
             self.state_description = 2
-        elif regions['left'] <= 1:
+        elif regions['left'] <= 0.85:
             # print('case 3 - left')
             self.state_description = 3 
-        elif regions['front'] <= 1 and regions['fleft'] >= 1 and regions['fright'] >= 1:
+        elif regions['front'] <= 0.85 and regions['fleft'] >= 0.85 and regions['fright'] >= 0.85:
             # print('case 4 - front')
             self.state_description = 4
-        elif regions['front'] >= 1 and regions['fleft'] >= 1 and regions['fright'] <= 1:
+        elif regions['front'] >= 0.85 and regions['fleft'] >= 0.85 and regions['fright'] <= 0.85:
             # print('case 5 - fright')
             self.state_description = 5
-        elif regions['front'] >= 1 and regions['fleft'] <= 1 and regions['fright'] >= 1:
+        elif regions['front'] >= 0.85 and regions['fleft'] <= 0.85 and regions['fright'] >= 0.85:
             # print('case 6 - fleft')
             self.state_description = 6
-        elif regions['front'] <= 1 and regions['fleft'] >= 1 and regions['fright'] <= 1:
+        elif regions['front'] <= 0.85 and regions['fleft'] >= 0.85 and regions['fright'] <= 0.85:
             # print('case 7 - front and fright')
             self.state_description = 7
-        elif regions['front'] <= 1 and regions['fleft'] <= 1 and regions['fright'] >= 1:
+        elif regions['front'] <= 0.85 and regions['fleft'] <= 0.85 and regions['fright'] >= 0.85:
             # print('case 8 - front and fleft')
             self.state_description = 8
-        elif regions['front'] <= 1 and regions['fleft'] <= 1 and regions['fright'] <= 1:
+        elif regions['front'] <= 0.85 and regions['fleft'] <= 0.85 and regions['fright'] <= 0.85:
             # print('case 9 - f/ront and fleft and fright')
             self.state_description = 9
-        elif regions['front'] >= 1 and regions['fleft'] <= 1 and regions['fright'] <= 1:
+        elif regions['front'] >= 0.85 and regions['fleft'] <= 0.85 and regions['fright'] <= 0.85:
             # print('case 10 - fleft and fright')
             self.state_description = 10
         else:
@@ -189,8 +189,7 @@ class TurtleBot:
             linear_x = 0
             angular_z = -0.3
             # exit(0)
-        if(self.agent_name == 'robot_7'):
-            print(self.state_description)
+        # print(self.state_description)
         self.vel_msg = Twist()
         self.vel_msg.linear.x = linear_x
         self.vel_msg.angular.z = angular_z
