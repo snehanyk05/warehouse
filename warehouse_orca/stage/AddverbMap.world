@@ -44,14 +44,14 @@ floorplan
 turtlebot
 (
   pose [5.0 58.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_0"
   color "red"
 )
 
 turtlebot
 (
   pose [5.0 56.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_1"
   color "purple"
 )
 
@@ -59,7 +59,7 @@ turtlebot
 turtlebot
 (
   pose [5.0 54.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_2"
   color "green"
 )
 
@@ -67,7 +67,7 @@ turtlebot
 turtlebot
 (
   pose [5.0 52.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_3"
   color "blue"
 )
 
@@ -75,49 +75,49 @@ turtlebot
 turtlebot
 (
   pose [5.0 50.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_4"
   color "yellow"
 )
 
 turtlebot
 (
   pose [5.0 48.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_5"
   color "cyan"
 )
 
 turtlebot
 (
   pose [5.0 46.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_6"
   color "purple"
 )
 
 turtlebot
 (
   pose [5.0 44.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_7"
   color "pink"
 )
 
 turtlebot
 (
   pose [5.0 42.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_8"
   color "grey"
 )
 
 turtlebot
 (
   pose [5.0 40.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_9"
   color "orange"
 )
 
 turtlebot
 (
   pose [5.0 38.0 0.0 0.0]
-  name "turtlebot"
+  name "robot_10"
   color "brown"
 )
 

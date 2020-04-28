@@ -30,7 +30,7 @@
   <node pkg="stage_ros" type="stageros" name="stageros" args="$(arg world_file)">
   </node>
 
-<!-- 
+
   <node pkg="map_server" name="map_server" type="map_server" args="$(find warehouse_orca)/stage/AddverbMap.yaml"/>
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_0"/>
@@ -41,30 +41,66 @@
   </include>
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_1"/>
+     <param name="Euclidean" value="false"/>
+    <param name="OccupyThresh" value="-1"/>
+    <param name="InflateRadius" value="2.0"/>
+    <param name="rate" value="10"/>
   </include>
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_2"/>
+     <param name="Euclidean" value="false"/>
+    <param name="OccupyThresh" value="-1"/>
+    <param name="InflateRadius" value="2.0"/>
+    <param name="rate" value="10"/>
   </include>
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_3"/>
+     <param name="Euclidean" value="false"/>
+    <param name="OccupyThresh" value="-1"/>
+    <param name="InflateRadius" value="2.0"/>
+    <param name="rate" value="10"/>
   </include>
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_4"/>
+     <param name="Euclidean" value="false"/>
+    <param name="OccupyThresh" value="-1"/>
+    <param name="InflateRadius" value="2.0"/>
+    <param name="rate" value="10"/>
   </include>
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_5"/>
+     <param name="Euclidean" value="false"/>
+    <param name="OccupyThresh" value="-1"/>
+    <param name="InflateRadius" value="2.0"/>
+    <param name="rate" value="10"/>
   </include>
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_6"/>
+     <param name="Euclidean" value="false"/>
+    <param name="OccupyThresh" value="-1"/>
+    <param name="InflateRadius" value="2.0"/>
+    <param name="rate" value="10"/>
   </include>
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_7"/>
+     <param name="Euclidean" value="false"/>
+    <param name="OccupyThresh" value="-1"/>
+    <param name="InflateRadius" value="2.0"/>
+    <param name="rate" value="10"/>
   </include>
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_8"/>
+     <param name="Euclidean" value="false"/>
+    <param name="OccupyThresh" value="-1"/>
+    <param name="InflateRadius" value="2.0"/>
+    <param name="rate" value="10"/>
   </include><include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_9"/>
-  </include> -->
-<!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find astar)/rviz/astar.rviz"/> -->
+     <param name="Euclidean" value="false"/>
+    <param name="OccupyThresh" value="-1"/>
+    <param name="InflateRadius" value="2.0"/>
+    <param name="rate" value="10"/>
+  </include>
+<node pkg="rviz" type="rviz" name="rviz" args="-d $(find astar)/rviz/astar.rviz"/>
 
 </launch>

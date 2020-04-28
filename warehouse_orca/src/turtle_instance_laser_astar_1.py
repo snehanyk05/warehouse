@@ -2,9 +2,9 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, PoseStamped, PoseWithCovarianceStamped
 from tf.transformations import euler_from_quaternion
-from nav_msgs.msg import Odometry
+from nav_msgs.msg import Odometry, Path
 from sensor_msgs.msg import LaserScan
 import sys
 from std_msgs.msg import String
@@ -30,6 +30,9 @@ class TurtleBot:
 
 		
         self.velocity_publisher = rospy.Publisher('/'+self.agent_name+'/cmd_vel', Twist, queue_size=10)
+        self.init_pose_publisher = rospy.Publisher('/'+self.agent_name+'/initialpose', PoseWithCovarianceStamped, queue_size=10)
+        self.goal_publisher = rospy.Publisher('/'+self.agent_name+'/move_base_simple/goal', PoseStamped, queue_size=10)
+
         self.publish_information = rospy.Publisher("/common_information", Information, queue_size=10)
 
         self.pub_pose = Odometry()
@@ -37,14 +40,17 @@ class TurtleBot:
         self.start_time=time.time()
         self.track_time = time.time()
         self.state_description = 0
+        self.count_stuck = 0
         ### Subscriber ###
 
         # self.update_pose is called when a message of type Pose is received.
         self.pose_subscriber = rospy.Subscriber('/'+self.agent_name+'/base_pose_ground_truth', Odometry, self.update_pose)
         self.scan_subscriber = rospy.Subscriber('/'+self.agent_name+'/base_scan', LaserScan, self.clbk_laser)
+        self.nav_path_subscriber = rospy.Subscriber('/'+self.agent_name+'/nav_path', Path, self.found_path)
+        
         # self.recieve_from_information_channel is called when a message of type information is received.
         rospy.Subscriber("/common_information", Information, self.recieve_from_information_channel)
-
+        self.nav_path = Path()
         self.odom = Odometry()
         self.theta = 0;
         self.rate = rospy.Rate(10)
@@ -95,41 +101,40 @@ class TurtleBot:
         #                 if(regions['right'] > 1):
         #                     print("In here right")
             
-        if regions['front'] >= 0.7 and regions['fleft'] >= 0.7 and regions['fright'] >= 0.7 and regions['right'] >= 0.7 and regions['left'] >= 0.7:
-            # 'case 1 - nothing'
+        if regions['front'] >= 1 and regions['fleft'] >= 1 and regions['fright'] >= 1 and regions['right'] >= 1 and regions['left'] >= 1:
+            # print('case 1 - nothing')
             self.state_description = 1
-        elif regions['right'] <= 0.7:
-            # 'case 1 - nothing'
+        elif regions['right'] <= 1:
+            # print('case 2 - right')
             self.state_description = 2
-        elif regions['left'] <= 0.7:
+        elif regions['left'] <= 1:
+            # print('case 3 - left')
             self.state_description = 3 
-        elif regions['front'] <= 0.7 and regions['fleft'] >= 0.7 and regions['fright'] >= 0.7:
-            # 'case 2 - front'
+        elif regions['front'] <= 1 and regions['fleft'] >= 1 and regions['fright'] >= 1:
+            # print('case 4 - front')
             self.state_description = 4
-        elif regions['front'] >= 0.7 and regions['fleft'] >= 0.7 and regions['fright'] <= 0.7:
-            # 'case 3 - fright'
+        elif regions['front'] >= 1 and regions['fleft'] >= 1 and regions['fright'] <= 1:
+            # print('case 5 - fright')
             self.state_description = 5
-        elif regions['front'] >= 0.7 and regions['fleft'] <= 0.7 and regions['fright'] >= 0.7:
-            # state_description = 'case 4 - fleft'
+        elif regions['front'] >= 1 and regions['fleft'] <= 1 and regions['fright'] >= 1:
+            # print('case 6 - fleft')
             self.state_description = 6
-            linear_x = 0
-            angular_z = -0.3
-        elif regions['front'] <= 0.7 and regions['fleft'] >= 0.7 and regions['fright'] <= 0.7:
-            # state_description = 'case 5 - front and fright'
+        elif regions['front'] <= 1 and regions['fleft'] >= 1 and regions['fright'] <= 1:
+            # print('case 7 - front and fright')
             self.state_description = 7
-        elif regions['front'] <= 0.7 and regions['fleft'] <= 0.7 and regions['fright'] >= 0.7:
-            # front and fleft'
+        elif regions['front'] <= 1 and regions['fleft'] <= 1 and regions['fright'] >= 1:
+            # print('case 8 - front and fleft')
             self.state_description = 8
-        elif regions['front'] <= 0.7 and regions['fleft'] <= 0.7 and regions['fright'] <= 0.7:
-            # front and fleft and fright'
+        elif regions['front'] <= 1 and regions['fleft'] <= 1 and regions['fright'] <= 1:
+            # print('case 9 - f/ront and fleft and fright')
             self.state_description = 9
-        elif regions['front'] >= 0.7 and regions['fleft'] <= 0.7 and regions['fright'] <= 0.7:
-            # fleft and fright'
+        elif regions['front'] >= 1 and regions['fleft'] <= 1 and regions['fright'] <= 1:
+            # print('case 10 - fleft and fright')
             self.state_description = 10
         else:
             # state_description = 'unknown case'
             self.state_description = 11
-            print("UNNNNNKNOWNNN")
+            print("case 11 - UNNNNNKNOWNNN")
             rospy.loginfo(self.agent_name+'; '+str(self.state_description)+":::::::")
             rospy.loginfo(regions)
             exit(0)
@@ -152,39 +157,40 @@ class TurtleBot:
             angular_z = 0
         elif self.state_description == 2:
             linear_x = 0
-            angular_z = 0.5
+            angular_z = 0.3
         elif self.state_description == 3:
             linear_x = 0
-            angular_z = -0.5
+            angular_z = -0.3
 
 
         elif self.state_description == 4:
             linear_x = 0
-            angular_z = 0.5
+            angular_z = 0.3
         elif self.state_description == 5:
             linear_x = 0
-            angular_z = 0.5
+            angular_z = 0.3
         elif self.state_description == 6:
             linear_x = 0
-            angular_z = -0.5
+            angular_z = -0.3
         elif self.state_description == 7:
             linear_x = 0
-            angular_z = 0.5
+            angular_z = 0.3
         elif self.state_description == 8:
             linear_x = 0
-            angular_z = -0.5
+            angular_z = -0.3
         elif self.state_description == 9:
             linear_x = 0
-            angular_z = 0.5
+            angular_z = 0.3
         elif self.state_description == 10:
-            linear_x = 0.5
+            linear_x = 0.3
             angular_z = 0
         else: 
             rospy.loginfo("Invalid")
             linear_x = 0
-            angular_z = -0.6
+            angular_z = -0.3
             # exit(0)
-
+        if(self.agent_name == 'robot_7'):
+            print(self.state_description)
         self.vel_msg = Twist()
         self.vel_msg.linear.x = linear_x
         self.vel_msg.angular.z = angular_z
@@ -197,20 +203,27 @@ class TurtleBot:
             self.count_stuck = self.count_stuck + 1
 
             if(self.count_stuck > 200):
-                print("3 Collision "+ self.agent_name)
+                # print("3 Collision "+ self.agent_name)
                 self.heading = self.choose_new_velocity_RVO()
                 self.vel_msg = Twist()
                 self.vel_msg.linear.x = 0.2
                 self.vel_msg.angular.z = self.heading - self.theta
                 self.velocity_publisher.publish(self.vel_msg)
-                if(self.count_stuck > 210):
-                    self.count_stuck = 0
+                # if(self.agent_name != 'robot_7'):
+                self.count_stuck = 0
                 self.track_time = time.time();
         else:
             # print("HERE IN ELSE RAD")
             self.previous_pose = self.odom
             self.count_stuck = 0
     
+    def found_path(self, data):
+        """Callback function which is called when a new message of type Pose is
+        received by the subscriber."""
+        
+        # print(data)
+        self.nav_path = data
+        print("found path")
     def update_pose(self, data):
         """Callback function which is called when a new message of type Pose is
         received by the subscriber."""
@@ -218,9 +231,9 @@ class TurtleBot:
         # print("POSSSSSSSSSSSE:",self.pose)
         
         self.odom = data
-        if(time.time() - self.track_time > 30 ):
+        # if(time.time() - self.track_time > 30 ):
         
-            self.checkStuckInRadius()
+        #     self.checkStuckInRadius()
         
         rot_q = data.pose.pose.orientation
         (roll,pitch,theta) = \
@@ -262,7 +275,12 @@ class TurtleBot:
         """Euclidean distance between current pose and the goal."""
         return sqrt(pow((goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x), 2) +
                     pow((goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y), 2))
-
+    def euclidean_distance_pose(self, pose):
+        # print("EUCLID"+self.agent_name)
+        # print(goal_pose.pose.pose.position, self.odom.pose.pose.position  )
+        """Euclidean distance between current pose and the goal."""
+        return sqrt(pow((pose.pose.position.x - self.odom.pose.pose.position.x), 2) +
+                    pow((pose.pose.position.y - self.odom.pose.pose.position.y), 2))
     # sets heading towards given direction
     def set_heading(self,theta):
         rospy.sleep(0.1)
@@ -369,7 +387,7 @@ class TurtleBot:
                     if (self._distance < self._least_distance):
                         self._least_distance = self._distance
 
-        self.vel_msg.linear.x = (self._least_distance/3)/self.NR
+        self.vel_msg.linear.x = (self._least_distance/4.5)/self.NR
         #print(self.time_to_collision)
 
                     #print(self.agent_name)
@@ -462,7 +480,6 @@ class TurtleBot:
         # print(self.best_min)
         # print("===")
         #rospy.sleep(1)
-        
         #####then return a velocity that is average of current velocity and a velocity outside VO nearer to current heading
         return self.best_min
 # end
@@ -491,91 +508,205 @@ class TurtleBot:
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
 
+    def create_pose(self,pose_obj,type):
+        pose_stamped = type
+        pose_stamped.header.frame_id = 'map'
+        pose_stamped.header.stamp = rospy.Time.now() 
+        
+        pose = pose_obj.pose.pose
+        # print(pose)
+        position = pose.position
+        orientation = pose.orientation
+        covariance = pose_obj.pose.covariance
+
+        
+
+        if hasattr(pose_stamped.pose, 'covariance'):
+        # if(pose_stamped.pose.covariance):
+            pose_stamped.pose.pose.position.x = position.x
+            pose_stamped.pose.pose.position.y = position.y
+            pose_stamped.pose.pose.position.z = position.z
+
+            pose_stamped.pose.pose.orientation.y = orientation.x 
+            pose_stamped.pose.pose.orientation.x = orientation.y 
+            pose_stamped.pose.pose.orientation.z = orientation.z
+            pose_stamped.pose.pose.orientation.w = orientation.w
+            pose_stamped.pose.covariance = covariance
+
+        else:
+            pose_stamped.pose.position.x = position.x
+            pose_stamped.pose.position.y = position.y
+            pose_stamped.pose.position.z = position.z
+
+            pose_stamped.pose.orientation.y = orientation.x 
+            pose_stamped.pose.orientation.x = orientation.y 
+            pose_stamped.pose.orientation.z = orientation.z
+            pose_stamped.pose.orientation.w = orientation.w
+
+        return pose_stamped 
+    
+    def getNavPath(self,x,y):
+        self.goal_pose = Odometry()
+
+        # Get the input from the function call.
+        self.goal_pose.pose.pose.position.x = x
+        self.goal_pose.pose.pose.position.y = y
+        # print("1")
+        # print(self.odom)
+        rospy.sleep(1)
+        init = self.create_pose(self.odom, PoseWithCovarianceStamped())
+        self.init_pose_publisher.publish(init)
+        # print(2)
+        # print(self.goal_pose)
+        goal = self.create_pose(self.goal_pose, PoseStamped())
+        self.goal_publisher.publish(goal)
+        
+
     def requestTasks(self):
         result = self.goalServiceRequest()
         if(result.task_available == True):
+            self.getNavPath(result.x,result.y)
             time = self.move2goal_rvo(result.x,result.y)
             x = self.agent_name.split("_")
             self.goalCompleteRequest(x[1],time,0)
             self.requestTasks()
         else:
             print("Request Failed")
-            
+  
+    def linear_vel_pose(self, goal_pose, constant=1.5):
+        return constant * self.euclidean_distance_pose(goal_pose)
+    def linear_vel(self, goal_pose, constant=1.5):
+        return constant * self.euclidean_distance(goal_pose)
+    def steering_angle(self, goal_pose):
+        return atan2(goal_pose.y - self.odom.pose.pose.position.y, goal_pose.x - self.odom.pose.pose.position.x)
+
+    def angular_vel(self, goal_pose, constant=6):
+        delta = (self.steering_angle(goal_pose) - self.theta) 
+        if (delta > np.pi):
+            delta -= 2*np.pi
+        elif (delta <= -np.pi):
+                delta += 2*np.pi;
+        return constant * delta 
+
+    def angular_vel_2(self, angle, constant=6):
+        delta = (angle - self.theta) 
+        if (delta > np.pi):
+            delta -= 2*np.pi
+        elif (delta <= -np.pi):
+                delta += 2*np.pi;
+        return constant * delta  
 
     def move2goal_rvo(self,x,y):
         self.start_time = time.time()
-        self.goal_pose = Odometry()
-
-        # Get the input from the function call.
-        self.goal_pose.pose.pose.position.x = x
-        self.goal_pose.pose.pose.position.y = y
-
-        # Please, insert a number slightly greater than 0 (e.g. 0.01).
         distance_tolerance = 0.2
-        rospy.sleep(0.1)
+        rospy.sleep(2)
         
 
-        self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
-        self.heading = self.desired_heading
-        # print("Pub 1"+self.agent_name+" :"+str(self.heading))
-        # print(self.odom.pose.pose.position)
-        self.vel_msg = Twist()
-        self.vel_msg.linear.x = 0.2
-        self.vel_msg.angular.z = self.heading - self.theta
-        self.velocity_publisher.publish(self.vel_msg)
-        
-        
-        while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<500)) :
-            #self.vel_msg.linear.x = 0.5
-            self.update_RVO(self.vel_msg.linear.x)
-            if(self.state_description == 1):
-                if(self.collision() == True):
-                    print("COLLLLLLISION"+ self.agent_name)
-                    #print("Inside RVO. Should choose new velocity")
-                    #print("The new choosen velocity is : ")
-                    #self.heading = self.choose_new_velocity_VO()
-                    self.heading = self.choose_new_velocity_RVO()
-                    if (self.best_min == None):
-                        #self.vel_msg.linear.x = self.penalize(self.vel_msg.linear.x)
-                        # print("#########################################")
-                        self.heading = self.prev_heading
-                        #self.vel_msg.linear.x = 0.1
-                    self.set_heading(self.heading)
-                    #print(self.heading)
-                    #print("---")
-                    #self.heading = self.VO[]
-                    #self.set_heading(self.heading)
-                    #rospy.sleep(0.01)
-                else:
-                    self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
-                    if(self.in_RVO(self.desired_heading) == True):
-                        print("2 Collision"+ self.agent_name)
-                        #print("desired heading still inside. Continue prev heading")
-                        #self.vel_msg.linear.x = 0
-                        #self.heading = self.prev_heading
-                        self.heading = self.choose_new_velocity_RVO()
-                    else:
-                        # print("3")
-                        self.heading = self.desired_heading
-                        print("Pub 3.1"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))    
-                    self.set_heading(self.heading) 
-                    # print("Pub 3.2"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))   
-                self.vel_msg.angular.z = self.heading - self.theta;
-                # print("3:"+str(self.heading))
-                # exit(0)
-                
-            else:
-                self.state_velocities();
+        if(len(self.nav_path.poses)>0):
+
+            i = 10
+            poses = self.nav_path.poses
+            self.vel_msg = Twist()
+            self.vel_msg.linear.x = 0
+            self.vel_msg.angular.z = self.angular_vel((poses[i]).pose.position)
+            
             self.velocity_publisher.publish(self.vel_msg)
-            # print("Pub 2");
-            self.publish_to_information_channel(self.agent_name)
-            self.prev_heading = self.heading
-            # print("-----")
-        # Stopping the agent after the movement is over.
-        self.vel_msg.linear.x = 0
-        self.velocity_publisher.publish(self.vel_msg)
-        print("Task completion for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
-        # If we press control + C, the node will stop.
-        #rospy.spin()
-        return (time.time() - self.start_time)
+        
+        
+            while ((i<len(poses)-1)  and  ((time.time() - self.start_time)<500)):
+                # if(self.agent_name == 'robot_7'):
+                #         print(poses[i])
+                self.vel_msg = Twist()
+                self.vel_msg.linear.x = self.linear_vel_pose((poses[i]))
+                self.vel_msg.angular.z = self.angular_vel((poses[i]).pose.position)
+                self.velocity_publisher.publish(self.vel_msg)
+                while((self.euclidean_distance_pose(poses[i]) >= 0.5) and ((time.time() - self.start_time)<125)): 
+                    # if(self.agent_name == 'robot_7'):
+
+                    #     print("In second loop")
+                    #     print(self.euclidean_distance_pose(poses[i]))
+                    self.vel_msg.linear.x = self.linear_vel_pose((poses[i]),0.5)
+                    self.update_RVO(self.vel_msg.linear.x)
+                    if(self.state_description == 1):
+                        if(self.collision() == True):
+                        
+                            self.heading = self.choose_new_velocity_RVO()
+                            if (self.best_min == None):
+                                
+                                self.heading = self.prev_heading
+                            
+                            self.set_heading(self.heading)
+                        else:
+                            self.desired_heading = self.steering_angle((poses[i]).pose.position)
+                            
+                            if(self.in_RVO(self.desired_heading) == True):
+                                self.heading = self.choose_new_velocity_RVO()
+                            else:
+                                
+                                self.heading = self.desired_heading
+                                # if(self.agent_name == 'robot_7'):
+                                #     print("3 no col"+self.agent_name)
+                                #     print(self.heading - self.theta)
+                                self.set_heading(self.heading) 
+                                
+                        self.vel_msg.angular.z = self.angular_vel_2(self.heading);
+                    
+                        
+                    else:
+                        self.state_velocities();
+                    self.velocity_publisher.publish(self.vel_msg)
+                
+                    self.publish_to_information_channel(self.agent_name)
+                    self.prev_heading = self.heading
+                    
+                    
+                i += 10
+                #here
+                # if( i >= len(self.nav_path.poses) - 1):
+                #         i = len(self.nav_path.poses) - 2
+                # else:
+                        
+               
+
+
+
+            if self.euclidean_distance(self.goal_pose) < distance_tolerance:
+                
+                self.vel_msg.linear.x = 0
+                self.velocity_publisher.publish(self.vel_msg)
+                print("Task completion time for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
+                return (time.time() - self.start_time)
+            else:
+                print("Goal not within tolerance")
+                while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<500)):
+                    self.vel_msg.linear.x = self.linear_vel(self.goal_pose,0.5)
+                    self.update_RVO(self.vel_msg.linear.x)
+                    if(self.state_description == 1):
+                        if(self.collision() == True):
+                            self.heading = self.choose_new_velocity_RVO()
+                            if (self.best_min == None):
+                                self.heading = self.prev_heading
+                            self.set_heading(self.heading)
+                        else:
+                            self.desired_heading = atan2(self.goal_pose.pose.pose.position.y - self.odom.pose.pose.position.y, self.goal_pose.pose.pose.position.x - self.odom.pose.pose.position.x)
+                            if(self.in_RVO(self.desired_heading) == True):
+                                self.heading = self.choose_new_velocity_RVO()
+                            else:
+                                self.heading = self.desired_heading
+                            self.set_heading(self.heading) 
+                        self.vel_msg.angular.z = self.heading - self.theta;
+                        
+                    else:
+                        self.state_velocities();
+                    self.velocity_publisher.publish(self.vel_msg)
+                    self.publish_to_information_channel(self.agent_name)
+                    self.prev_heading = self.heading
+            
+                self.vel_msg.linear.x = 0
+                self.vel_msg.angular.z = 0
+                self.velocity_publisher.publish(self.vel_msg)
+                print("Task completion time for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
+                return (time.time() - self.start_time)
+        else:
+            print("No Nav Path")
 

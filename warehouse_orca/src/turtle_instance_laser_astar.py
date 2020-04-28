@@ -40,6 +40,7 @@ class TurtleBot:
         self.start_time=time.time()
         self.track_time = time.time()
         self.state_description = 0
+        self.count_stuck = 0
         ### Subscriber ###
 
         # self.update_pose is called when a message of type Pose is received.
@@ -100,34 +101,34 @@ class TurtleBot:
         #                 if(regions['right'] > 1):
         #                     print("In here right")
             
-        if regions['front'] >= 0.5 and regions['fleft'] >= 0.5 and regions['fright'] >= 0.5 and regions['right'] >= 0.5 and regions['left'] >= 0.5:
+        if regions['front'] >= 0.7 and regions['fleft'] >= 0.7 and regions['fright'] >= 0.7 and regions['right'] >= 0.7 and regions['left'] >= 0.7:
             # print('case 1 - nothing')
             self.state_description = 1
-        elif regions['right'] <= 0.5:
+        elif regions['right'] <= 0.7:
             # print('case 2 - right')
             self.state_description = 2
-        elif regions['left'] <= 0.5:
+        elif regions['left'] <= 0.7:
             # print('case 3 - left')
             self.state_description = 3 
-        elif regions['front'] <= 0.5 and regions['fleft'] >= 0.5 and regions['fright'] >= 0.5:
+        elif regions['front'] <= 0.7 and regions['fleft'] >= 0.7 and regions['fright'] >= 0.7:
             # print('case 4 - front')
             self.state_description = 4
-        elif regions['front'] >= 0.5 and regions['fleft'] >= 0.5 and regions['fright'] <= 0.5:
+        elif regions['front'] >= 0.7 and regions['fleft'] >= 0.7 and regions['fright'] <= 0.7:
             # print('case 5 - fright')
             self.state_description = 5
-        elif regions['front'] >= 0.5 and regions['fleft'] <= 0.5 and regions['fright'] >= 0.5:
+        elif regions['front'] >= 0.7 and regions['fleft'] <= 0.7 and regions['fright'] >= 0.7:
             # print('case 6 - fleft')
             self.state_description = 6
-        elif regions['front'] <= 0.5 and regions['fleft'] >= 0.5 and regions['fright'] <= 0.5:
+        elif regions['front'] <= 0.7 and regions['fleft'] >= 0.7 and regions['fright'] <= 0.7:
             # print('case 7 - front and fright')
             self.state_description = 7
-        elif regions['front'] <= 0.5 and regions['fleft'] <= 0.5 and regions['fright'] >= 0.5:
+        elif regions['front'] <= 0.7 and regions['fleft'] <= 0.7 and regions['fright'] >= 0.7:
             # print('case 8 - front and fleft')
             self.state_description = 8
-        elif regions['front'] <= 0.5 and regions['fleft'] <= 0.5 and regions['fright'] <= 0.5:
+        elif regions['front'] <= 0.7 and regions['fleft'] <= 0.7 and regions['fright'] <= 0.7:
             # print('case 9 - f/ront and fleft and fright')
             self.state_description = 9
-        elif regions['front'] >= 0.5 and regions['fleft'] <= 0.5 and regions['fright'] <= 0.5:
+        elif regions['front'] >= 0.7 and regions['fleft'] <= 0.7 and regions['fright'] <= 0.7:
             # print('case 10 - fleft and fright')
             self.state_description = 10
         else:
@@ -197,21 +198,24 @@ class TurtleBot:
     def checkStuckInRadius(self):
     
         if(self.euclidean_distance(self.previous_pose) <= 4):
-            print("HERE IN CHECK RAD")
+            # print("HERE IN CHECK RAD")
             self.count_stuck = self.count_stuck + 1
 
-            if(self.count_stuck > 5):
-                print("Changing angular velocity for "+ self.agent_name)
+            if(self.count_stuck > 200):
+                print("3 Collision "+ self.agent_name)
+                self.heading = self.choose_new_velocity_RVO()
                 self.vel_msg = Twist()
-                self.vel_msg.linear.x = 0
-                self.vel_msg.angular.z = -0.7
+                self.vel_msg.linear.x = 0.2
+                self.vel_msg.angular.z = self.heading - self.theta
                 self.velocity_publisher.publish(self.vel_msg)
-                self.count_stuck = 0
+                if(self.agent_name != 'robot_7'):
+                    self.count_stuck = 0
                 self.track_time = time.time();
         else:
-            print("HERE IN ELSE RAD")
+            # print("HERE IN ELSE RAD")
             self.previous_pose = self.odom
             self.count_stuck = 0
+    
     def found_path(self, data):
         """Callback function which is called when a new message of type Pose is
         received by the subscriber."""
@@ -226,9 +230,9 @@ class TurtleBot:
         # print("POSSSSSSSSSSSE:",self.pose)
         
         self.odom = data
-        # if(time.time() - self.track_time > 30 ):
+        if(time.time() - self.track_time > 30 ):
         
-        #     self.checkStuckInRadius()
+            self.checkStuckInRadius()
         
         rot_q = data.pose.pose.orientation
         (roll,pitch,theta) = \
@@ -595,7 +599,8 @@ class TurtleBot:
                     # print(self.odom.pose.pose.position)
             self.vel_msg = Twist()
             self.vel_msg.linear.x = 0.1
-            self.vel_msg.angular.z = self.heading
+            self.vel_msg.angular.z = self.heading - self.theta
+            
             self.velocity_publisher.publish(self.vel_msg)
         
         
@@ -604,7 +609,7 @@ class TurtleBot:
                 self.update_RVO(self.vel_msg.linear.x)
                 if(self.state_description == 1):
                     if(self.collision() == True):
-                        # print("COLLLLLLISION")
+                        # print("1 COLLLLLLISION ")
                         #print("Inside RVO. Should choose new velocity")
                         #print("The new choosen velocity is : ")
                         #self.heading = self.choose_new_velocity_VO()
@@ -625,17 +630,22 @@ class TurtleBot:
                         # print("POSE")
                         # print(poses[i])
                         if(self.in_RVO(self.desired_heading) == True):
-                            # print("2")
+                            # print("2 collision"+self.agent_name)
                             #print("desired heading still inside. Continue prev heading")
                             #self.vel_msg.linear.x = 0
                             #self.heading = self.prev_heading
                             self.heading = self.choose_new_velocity_RVO()
                         else:
-                            # print("3")
+                            
                             self.heading = self.desired_heading
+                            if(self.agent_name == 'robot_7'):
+                                # print("goal")
+                                # print(self.goal_pose)
+                                print("3 no col"+self.agent_name)
+                                print(self.heading - self.theta)
                         # print("Pub 3.1"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))    
-                        self.set_heading(self.heading) 
-                        # print("Pub 3.2"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))   
+                            self.set_heading(self.heading) 
+                            # print("Pub 3.2"+self.agent_name+" , Pos:"+str(self.odom.pose.pose.position)+" , Heading:"+str(self.heading))   
                     self.vel_msg.angular.z = self.heading - self.theta;
                     # rospy.sleep(2)
                     # print("theta")
@@ -651,11 +661,24 @@ class TurtleBot:
                 self.publish_to_information_channel(self.agent_name)
                 self.prev_heading = self.heading
                 # print("EU dis ")
-                if(self.euclidean_distance_pose(poses[i])<5):
+                if(self.agent_name == 'robot_7'):
+                        print(self.count_stuck)
+                if((self.euclidean_distance_pose(poses[i])<5 )):
+                    
+                    
                     if( i >= len(self.nav_path.poses) - 1):
                         i = len(self.nav_path.poses) - 1
                     else:
                         i += 10
+                elif(self.count_stuck > 200):
+                    
+                    if(self.agent_name == 'robot_7'):
+                        print("pose")
+                        print(poses[i])
+                        print("In next pose change")
+                        i+=20
+                        self.count_stuck = 0
+
 
 
             if self.euclidean_distance(self.goal_pose) < distance_tolerance:
