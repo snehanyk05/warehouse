@@ -658,8 +658,10 @@ class TurtleBot:
                     self.publish_to_information_channel(self.agent_name)
                     self.prev_heading = self.heading
                     
-                    
-                i += 10
+                if(self.euclidean_distance_pose(poses[i]) <= 0.5):
+                    i += 10
+                else:
+                    i += 4
                 #here
                 # if( i >= len(self.nav_path.poses) - 1):
                 #         i = len(self.nav_path.poses) - 2
