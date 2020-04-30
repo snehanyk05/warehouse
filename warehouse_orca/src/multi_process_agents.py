@@ -21,7 +21,7 @@ def multi_agents(agent_name,agent_obj,goal_x,goal_y,p_name):
     try:
         agent_obj = TurtleBot(agent_name)
         # agent_obj.start_point(sp_x,sp_y)
-        agent_obj.requestTasks()
+        agent_obj.begin(user_input)
         # agent_obj.move2goal_rvo(goal_x,goal_y)
 
     except rospy.ROSInterruptException:

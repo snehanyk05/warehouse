@@ -34,7 +34,6 @@ class TurtleBot:
         self.goal_publisher = rospy.Publisher('/'+self.agent_name+'/move_base_simple/goal', PoseStamped, queue_size=10)
 
         self.publish_information = rospy.Publisher("/common_information", Information, queue_size=10)
-
         self.pub_pose = Odometry()
         self.inf = Information()
         self.start_time=time.time()
@@ -247,10 +246,16 @@ class TurtleBot:
         i.agent_pose_x = self.odom.pose.pose.position.x
         i.agent_pose_y = self.odom.pose.pose.position.y
         i.agent_heading = self.heading
-        i.agent_vel_mag = self.vel_msg.linear.x
+        var_exists = 'self.vel_msg' in locals() or 'self.vel_msg' in globals()
+        if(var_exists):
+            i.agent_vel_mag = self.vel_msg.linear.x            
+        else:
+            # print('here')
+            i.agent_vel_mag = 0
 
         #print("Published the turtle node name on topic /common_information")
         self.publish_information.publish(i)
+
         self.rate.sleep()
 
     def recieve_from_information_channel(self,data):
@@ -263,6 +268,10 @@ class TurtleBot:
 
         self.pose_updated = [self.x_temp, self.y_temp, self.heading_temp, self.vel_mag_temp]
         self.all_agents_pose_dict.update({self.name_temp: self.pose_updated})
+        # print(self.total)
+        # if(self.total > 0 and (self.check_all_in(self.total))):
+        #     print('All In')
+        #     self.total = 0
 # end
 #-----------------------------------------------------------------------------------------#
 
@@ -492,7 +501,7 @@ class TurtleBot:
         try:
             goalCoord = rospy.ServiceProxy('request_available_task',Robot_Task_Request)
             x = self.agent_name.split("_")
-
+            print(x)
             response = goalCoord(x[1])
             return response
         except rospy.ServiceException, e:
@@ -550,6 +559,8 @@ class TurtleBot:
         # Get the input from the function call.
         self.goal_pose.pose.pose.position.x = x
         self.goal_pose.pose.pose.position.y = y
+        print(x,y)
+        print(self.odom.pose.pose.position.x,self.odom.pose.pose.position.y)
         # print("1")
         # print(self.odom)
         rospy.sleep(1)
@@ -560,6 +571,24 @@ class TurtleBot:
         goal = self.create_pose(self.goal_pose, PoseStamped())
         self.goal_publisher.publish(goal)
         
+    def begin(self,total):
+        self.total = total
+        print(self.agent_name)
+        rospy.wait_for_message('/'+self.agent_name+'/base_pose_ground_truth',Odometry)
+        # rospy.sleep(0.1)     
+        self.heading = self.theta
+        self.publish_to_information_channel(self.agent_name)
+        rospy.wait_for_message('ready',String)
+        self.requestTasks()
+
+    def check_all_in(self,total):
+
+        if(len(self.all_agents_pose_dict) == total):
+            return True
+        else:
+            return False
+            # rospy.sleep(0.1)
+            # self.check_all_in(total)
 
     def requestTasks(self):
         result = self.goalServiceRequest()
