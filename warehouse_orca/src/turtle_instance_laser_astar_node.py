@@ -45,6 +45,7 @@ class TurtleBot:
         self.x = 0
         self.y = 0
         self.busy = False
+        self.goal_receive = False
         ### Subscriber ###
 
         # self.update_pose is called when a message of type Pose is received.
@@ -226,10 +227,8 @@ class TurtleBot:
         
         
         self.nav_path = data
-        if(len(self.nav_path.poses)>0):
-            self.path_received = True
-        else:
-            self.busy = False
+        self.path_received = True
+        
         
 
     def update_pose(self, data):
@@ -604,20 +603,35 @@ class TurtleBot:
             # self.check_all_in(total)
 
     def requestTasks(self):
-        if(self.busy == False):
+        if((self.goal_receive == False)):
             result = self.goalServiceRequest()
             if(result.task_available == True):
+             
                 self.getNavPath(result.x,result.y)
                 self.x = result.x
                 self.y = result.y
-                self.busy = True
+                self.goal_receive = True
             else:
                 print("Request Failed")
-        elif(self.path_received == True):
-            time = self.move2goal_rvo(self.x, self.y)
-            x = self.agent_name.split("_")
-            self.goalCompleteRequest(x[1],time,0)
-            self.busy = False
+        else:
+            if(self.path_received == True):
+                if(len(self.nav_path.poses)>0):
+                    self.busy = True
+                    time = self.move2goal_rvo(self.x, self.y)
+                    x = self.agent_name.split("_")
+                    self.goalCompleteRequest(x[1],time,0)
+                    self.busy = False
+                    self.goal_receive = False
+                    
+                else:
+                    self.busy = False
+                    self.goal_receive = False
+                
+            
+            # else:
+            #     self.busy = False
+            #     self.goal_receive == False
+
   
     def linear_vel_pose(self, goal_pose, constant=1.5):
         return constant * self.euclidean_distance_pose(goal_pose)
@@ -650,7 +664,7 @@ class TurtleBot:
         # print(self.nav_path.poses)
         if(len(self.nav_path.poses)>0):
 
-            i = 10
+            i = 0
             poses = self.nav_path.poses
             self.vel_msg = Twist()
             self.vel_msg.linear.x = 0
