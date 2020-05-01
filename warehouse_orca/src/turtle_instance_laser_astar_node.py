@@ -15,6 +15,7 @@ import numpy as np
 import time
 import os
 ns = rospy.get_namespace()
+
 from math import pow, atan2, sqrt, cos, sin, atan, asin
 
 class TurtleBot:
@@ -27,19 +28,23 @@ class TurtleBot:
         self.agent_name = agent_name
         # print(self.agent_name)
         rospy.init_node(self.agent_name)
-        
+
+		
         self.velocity_publisher = rospy.Publisher('/'+self.agent_name+'/cmd_vel', Twist, queue_size=10)
         self.init_pose_publisher = rospy.Publisher('/'+self.agent_name+'/initialpose', PoseWithCovarianceStamped, queue_size=10)
         self.goal_publisher = rospy.Publisher('/'+self.agent_name+'/move_base_simple/goal', PoseStamped, queue_size=10)
 
         self.publish_information = rospy.Publisher("/common_information", Information, queue_size=10)
-
         self.pub_pose = Odometry()
         self.inf = Information()
         self.start_time=time.time()
         self.track_time = time.time()
         self.state_description = 0
         self.count_stuck = 0
+        self.path_received = False
+        self.x = 0
+        self.y = 0
+        self.busy = False
         ### Subscriber ###
 
         # self.update_pose is called when a message of type Pose is received.
@@ -219,9 +224,10 @@ class TurtleBot:
         """Callback function which is called when a new message of type Pose is
         received by the subscriber."""
         
-        # print(data)
+        self.path_received = True
         self.nav_path = data
-        print("found path")
+        
+
     def update_pose(self, data):
         """Callback function which is called when a new message of type Pose is
         received by the subscriber."""
@@ -246,10 +252,16 @@ class TurtleBot:
         i.agent_pose_x = self.odom.pose.pose.position.x
         i.agent_pose_y = self.odom.pose.pose.position.y
         i.agent_heading = self.heading
-        i.agent_vel_mag = self.vel_msg.linear.x
+        var_exists = 'self.vel_msg' in locals() or 'self.vel_msg' in globals()
+        if(var_exists):
+            i.agent_vel_mag = self.vel_msg.linear.x            
+        else:
+            # print('here')
+            i.agent_vel_mag = 0
 
         #print("Published the turtle node name on topic /common_information")
         self.publish_information.publish(i)
+
         self.rate.sleep()
 
     def recieve_from_information_channel(self,data):
@@ -262,6 +274,10 @@ class TurtleBot:
 
         self.pose_updated = [self.x_temp, self.y_temp, self.heading_temp, self.vel_mag_temp]
         self.all_agents_pose_dict.update({self.name_temp: self.pose_updated})
+        # print(self.total)
+        # if(self.total > 0 and (self.check_all_in(self.total))):
+        #     print('All In')
+        #     self.total = 0
 # end
 #-----------------------------------------------------------------------------------------#
 
@@ -328,20 +344,21 @@ class TurtleBot:
 
         self._least_distance = 10
         # print (self.all_agents_pose_dict)
-        for i in self.all_agents_pose_dict:
+        # k, value in list(kwargs.items())
+        for i, value in list(self.all_agents_pose_dict.items()):
             if(i != self.agent_name):
                 #calc distance between agent and oher agent/obstacle
-                self._distance = round(sqrt(pow((self.all_agents_pose_dict[i][0] - self.odom.pose.pose.position.x), 2) + pow((self.all_agents_pose_dict[i][1] - self.odom.pose.pose.position.y), 2)),rr)
+                self._distance = round(sqrt(pow((value[0] - self.odom.pose.pose.position.x), 2) + pow((value[1] - self.odom.pose.pose.position.y), 2)),rr)
 
                 #if it lies in the NR, consider it in calculating RVO
                 if(self._distance < self.NR):
                     #calc the relative velocity of the agent and choosen other agent
-                    self._rel_v_x =  v_mag * cos(self.theta) - self.all_agents_pose_dict[i][3] * cos(self.all_agents_pose_dict[i][2])
-                    self._rel_v_y =  v_mag * sin(self.theta) - self.all_agents_pose_dict[i][3] * sin(self.all_agents_pose_dict[i][2])
+                    self._rel_v_x =  v_mag * cos(self.theta) - value[3] * cos(value[2])
+                    self._rel_v_y =  v_mag * sin(self.theta) - value[3] * sin(value[2])
                     self._rel_heading[i] = round(atan2(self._rel_v_y,self._rel_v_x),rr)
 
                     # VO finder :: Should output a range of headings into an 2D array
-                    self.point_to_agent_heading[i] = round(atan2((self.all_agents_pose_dict[i][1] - self.odom.pose.pose.position.y),(self.all_agents_pose_dict[i][0] - self.odom.pose.pose.position.x)),rr)
+                    self.point_to_agent_heading[i] = round(atan2((value[1] - self.odom.pose.pose.position.y),(value[0] - self.odom.pose.pose.position.x)),rr)
                     #can also use np.clip
                     try:
                         # print("DIST "+self.agent_name ,self._distance)
@@ -357,15 +374,15 @@ class TurtleBot:
                     # if negative, it means collision will not occur
 
                     c1 = self._rel_v_x - (v_mag * (cos(self.theta))) <= 0
-                    c2 = self._rel_v_x - (v_mag * (cos(self.all_agents_pose_dict[i][2])))<= 0
+                    c2 = self._rel_v_x - (v_mag * (cos(value[2])))<= 0
                     c3 = self._rel_v_y - (v_mag * (sin(self.theta)))<= 0
-                    c4 = self._rel_v_y - (v_mag * (sin(self.all_agents_pose_dict[i][2])))<= 0
+                    c4 = self._rel_v_y - (v_mag * (sin(value[2])))<= 0
 
                     self.time_to_collision[i] = np.inf
                     if(c1 | c2 | c3 | c4):
-                        temp = abs(v_mag * (cos(self.theta) - cos(self.all_agents_pose_dict[i][2])))
+                        temp = abs(v_mag * (cos(self.theta) - cos(value[2])))
                         if temp != 0:
-                            self.time_to_collision[i] = abs(self.all_agents_pose_dict[i][0] - self.odom.pose.pose.position.x)/temp
+                            self.time_to_collision[i] = abs(value[0] - self.odom.pose.pose.position.x)/temp
                         
                             
 
@@ -374,9 +391,9 @@ class TurtleBot:
                     # This is computationally easier
                     self.VX[i] = (np.asarray([self.point_to_agent_heading[i] - self._omega[i],self.point_to_agent_heading[i] + self._omega[i]]))
                     #####find v_A by adding v_B to VX (both mag and dir)
-                    #self.VO[i] = self.VX[i] + self.all_agents_pose_dict[i][2]
-                    self.num = v_mag * sin(self.present_temp_h) + self.all_agents_pose_dict[i][3] * sin(self.all_agents_pose_dict[i][2])
-                    self.den = v_mag * cos(self.present_temp_h) + self.all_agents_pose_dict[i][3] * cos(self.all_agents_pose_dict[i][2])
+                    #self.VO[i] = self.VX[i] + value[2]
+                    self.num = v_mag * sin(self.present_temp_h) + value[3] * sin(value[2])
+                    self.den = v_mag * cos(self.present_temp_h) + value[3] * cos(value[2])
 
                     self.RVO[i] = (self.VX[i] + atan2(self.num,self.den))/2
                     #Uncomment the below line if you want the code to behave like VO
@@ -486,13 +503,12 @@ class TurtleBot:
 #-----------------------------------------------------------------------------------------#
 # RVO functions
     def goalServiceRequest(self):
-        print("here")
         rospy.wait_for_service('/request_available_task')
-        print("Service available for ")
+        #print("Service available for ", name)
         try:
             goalCoord = rospy.ServiceProxy('/request_available_task',Robot_Task_Request)
             x = self.agent_name.split("_")
-            # print(x)
+            print(x)
             response = goalCoord(x[1])
             return response
         except rospy.ServiceException, e:
@@ -550,6 +566,8 @@ class TurtleBot:
         # Get the input from the function call.
         self.goal_pose.pose.pose.position.x = x
         self.goal_pose.pose.pose.position.y = y
+        # print(x,y)
+        # print(self.odom.pose.pose.position.x,self.odom.pose.pose.position.y)
         # print("1")
         # print(self.odom)
         rospy.sleep(1)
@@ -559,22 +577,43 @@ class TurtleBot:
         # print(self.goal_pose)
         goal = self.create_pose(self.goal_pose, PoseStamped())
         self.goal_publisher.publish(goal)
+        rospy.sleep(1)
         
+    def begin(self):
+        # self.total = total
+        print(self.agent_name)
+        rospy.wait_for_message('/'+self.agent_name+'/base_pose_ground_truth',Odometry)
+        # rospy.sleep(0.1)     
+        self.heading = self.theta
+        self.publish_to_information_channel(self.agent_name)
+        rospy.wait_for_message('/ready',String)
+        while not rospy.is_shutdown():
+             self.requestTasks()
+
+    def check_all_in(self,total):
+
+        if(len(self.all_agents_pose_dict) == total):
+            return True
+        else:
+            return False
+            # rospy.sleep(0.1)
+            # self.check_all_in(total)
 
     def requestTasks(self):
-        # rospy.wait_for_service('ready')
-        print("before")
-        result = self.goalServiceRequest()
-        print(result)
-        if(result.task_available == True):
-            self.getNavPath(result.x,result.y)
-            time = self.move2goal_rvo(result.x,result.y)
+        if(self.busy == False):
+            result = self.goalServiceRequest()
+            if(result.task_available == True):
+                self.getNavPath(result.x,result.y)
+                self.x = result.x
+                self.y = result.y
+                self.busy = True
+            else:
+                print("Request Failed")
+        elif(self.path_received == True):
+            time = self.move2goal_rvo(self.x, self.y)
             x = self.agent_name.split("_")
             self.goalCompleteRequest(x[1],time,0)
-
-            self.requestTasks()
-        else:
-            print("Request Failed")
+            self.busy = False
   
     def linear_vel_pose(self, goal_pose, constant=1.5):
         return constant * self.euclidean_distance_pose(goal_pose)
@@ -604,7 +643,7 @@ class TurtleBot:
         distance_tolerance = 0.2
         rospy.sleep(2)
         
-
+        # print(self.nav_path.poses)
         if(len(self.nav_path.poses)>0):
 
             i = 10
@@ -616,7 +655,7 @@ class TurtleBot:
             self.velocity_publisher.publish(self.vel_msg)
         
         
-            while ((i<len(poses)-1)  and  ((time.time() - self.start_time)<500)):
+            while ((i<len(poses)-1)  and  ((time.time() - self.start_time)<700)):
                 # if(self.agent_name == 'robot_7'):
                 #         print(poses[i])
                 self.vel_msg = Twist()
@@ -665,7 +704,7 @@ class TurtleBot:
                 if(self.euclidean_distance_pose(poses[i]) <= 0.5):
                     i += 10
                 else:
-                    i += 4
+                    i += 8
                 #here
                 # if( i >= len(self.nav_path.poses) - 1):
                 #         i = len(self.nav_path.poses) - 2
@@ -683,7 +722,7 @@ class TurtleBot:
                 return (time.time() - self.start_time)
             else:
                 print("Goal not within tolerance")
-                while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<500)):
+                while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<900)):
                     self.vel_msg.linear.x = self.linear_vel(self.goal_pose,0.5)
                     self.update_RVO(self.vel_msg.linear.x)
                     if(self.state_description == 1):
@@ -711,9 +750,12 @@ class TurtleBot:
                 self.vel_msg.angular.z = 0
                 self.velocity_publisher.publish(self.vel_msg)
                 print("Task completion time for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
+                self.path_received = False
                 return (time.time() - self.start_time)
         else:
-            print("No Nav Path")
+            print("No Nav Path "+self.agent_name)
+
+
 
 def main():
       
@@ -726,7 +768,7 @@ def main():
 
     agent_obj = TurtleBot('robot_'+ns[7:len(ns)-1])
     # position of obstacles
-    agent_obj.requestTasks()
+    agent_obj.begin()
     # while not rospy.is_shutdown():
     #     #print("Aux", config.aux_stall_count)
         

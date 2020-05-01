@@ -80,7 +80,7 @@ void Astar::MapProcess(Mat& Mask)
     if(config.InflateRadius > 0)
     {
         Mat se = getStructuringElement(MORPH_RECT, Size(2 * config.InflateRadius, 2 * config.InflateRadius));
-        erode(src, _Map, se, Point(-1, -1), 6);
+        erode(src, _Map, se, Point(-1, -1), 4);
     }
 
     // Get mask

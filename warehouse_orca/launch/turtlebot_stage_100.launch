@@ -380,7 +380,8 @@
     <param name="OccupyThresh" value="-1"/>
     <param name="InflateRadius" value="2.0"/>
     <param name="rate" value="10"/>
-  </include><node pkg="warehouse_orca" name="rob50" type="turtle_instance_laser_astar_node.py" ns="robot_50" output="screen"/>    <include file="$(find astar)/launch/astar.launch">
+  </include>
+  <!-- <node pkg="warehouse_orca" name="rob50" type="turtle_instance_laser_astar_node.py" ns="robot_50" output="screen"/>    <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_50"/>
     <param name="Euclidean" value="false"/>
     <param name="OccupyThresh" value="-1"/>
@@ -720,7 +721,7 @@
     <param name="OccupyThresh" value="-1"/>
     <param name="InflateRadius" value="2.0"/>
     <param name="rate" value="10"/>
-  </include>
+  </include> -->
 <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find astar)/rviz/astar.rviz"/> -->
 <node pkg="warehouse_manager" type="warehouse_master" name="warehouse_master" />
 </launch>
