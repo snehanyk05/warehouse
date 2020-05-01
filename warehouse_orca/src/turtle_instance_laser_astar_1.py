@@ -599,7 +599,7 @@ class TurtleBot:
             # self.check_all_in(total)
 
     def requestTasks(self):
-        if(self.busy == False):
+        if(self.busy == False and self.path_received == False):
             result = self.goalServiceRequest()
             if(result.task_available == True):
                 self.getNavPath(result.x,result.y)
@@ -612,11 +612,11 @@ class TurtleBot:
                 exit(0)
         elif(self.path_received == True):
             time = self.move2goal_rvo(self.x, self.y)
-            self.path_received = False
+            
             self.busy = False
             x = self.agent_name.split("_")
             self.goalCompleteRequest(x[1],time,0)
-            
+            self.path_received = False
             
         # elif(self.path_received == False):
         #     self.busy = False
@@ -648,20 +648,21 @@ class TurtleBot:
         self.start_time = time.time()
         distance_tolerance = 0.2
         rospy.sleep(2)
-        
+
+        self.vel_msg = Twist()
         # print(self.nav_path.poses)
         if(len(self.nav_path.poses)>0):
 
             i = 0
             poses = self.nav_path.poses
-            self.vel_msg = Twist()
+            
             self.vel_msg.linear.x = 0
             self.vel_msg.angular.z = self.angular_vel((poses[i]).pose.position)
             
             self.velocity_publisher.publish(self.vel_msg)
         
         
-            while ((i<len(poses)-1)  and  ((time.time() - self.start_time)<500)):
+            while ((i<len(poses)-1)  and  ((time.time() - self.start_time)<600)):
                 # if(self.agent_name == 'robot_7'):
                 #         print(poses[i])
                 self.vel_msg = Twist()
@@ -725,11 +726,21 @@ class TurtleBot:
                 self.vel_msg.linear.x = 0
                 self.velocity_publisher.publish(self.vel_msg)
                 print("Task completion time for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
-                self.path_received = False
+                # self.path_received = False
                 return (time.time() - self.start_time)
             else:
+                # self.path_received = False
                 print("Goal not within tolerance")
-                while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<500)):
+                return self.headTowardsGoal(distance_tolerance)
+        else:
+            # self.path_received = False
+            print("No Nav Path "+self.agent_name)
+            return self.headTowardsGoal(distance_tolerance)
+        # self.path_received = False
+        return 0
+
+    def headTowardsGoal(self,distance_tolerance):
+        while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<800)):
                     self.vel_msg.linear.x = self.linear_vel(self.goal_pose,0.5)
                     self.update_RVO(self.vel_msg.linear.x)
                     if(self.state_description == 1):
@@ -753,16 +764,11 @@ class TurtleBot:
                     self.publish_to_information_channel(self.agent_name)
                     self.prev_heading = self.heading
             
-                self.vel_msg.linear.x = 0
-                self.vel_msg.angular.z = 0
-                self.velocity_publisher.publish(self.vel_msg)
-                print("Task completion time for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
-                self.path_received = False
-                return (time.time() - self.start_time)
-        else:
-            self.path_received = False
-            print("No Nav Path "+self.agent_name)
-        self.path_received = False
-        return 0
+        self.vel_msg.linear.x = 0
+        self.vel_msg.angular.z = 0
+        self.velocity_publisher.publish(self.vel_msg)
+        print("Task completion time for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
+        # self.path_received = False
+        return (time.time() - self.start_time)
             
 
