@@ -224,8 +224,12 @@ class TurtleBot:
         """Callback function which is called when a new message of type Pose is
         received by the subscriber."""
         
-        self.path_received = True
+        
         self.nav_path = data
+        if(len(self.nav_path.poses)>0):
+            self.path_received = True
+        else:
+            self.busy = False
         
 
     def update_pose(self, data):
@@ -753,6 +757,7 @@ class TurtleBot:
                 self.path_received = False
                 return (time.time() - self.start_time)
         else:
+            self.path_received = False
             print("No Nav Path "+self.agent_name)
 
 

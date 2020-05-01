@@ -185,6 +185,10 @@ int main(int argc, char * argv[])
             else
             {
                 ROS_ERROR("Can not find a valid path");
+                path.header.stamp = ros::Time::now();
+                path.header.frame_id = "map";
+                path.poses.clear();
+                path_pub.publish(path);
             }
 
             // Set flag

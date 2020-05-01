@@ -613,6 +613,8 @@ class TurtleBot:
             x = self.agent_name.split("_")
             self.goalCompleteRequest(x[1],time,0)
             self.busy = False
+        # elif(self.path_received == False):
+        #     self.busy = False
   
     def linear_vel_pose(self, goal_pose, constant=1.5):
         return constant * self.euclidean_distance_pose(goal_pose)
