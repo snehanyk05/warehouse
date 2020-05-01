@@ -607,12 +607,17 @@ class TurtleBot:
                 self.y = result.y
                 self.busy = True
             else:
+                
                 print("Request Failed")
-        elif(self.path_received):
+                exit(0)
+        elif(self.path_received == True):
             time = self.move2goal_rvo(self.x, self.y)
+            self.path_received = False
+            self.busy = False
             x = self.agent_name.split("_")
             self.goalCompleteRequest(x[1],time,0)
-            self.busy = False
+            
+            
         # elif(self.path_received == False):
         #     self.busy = False
   
@@ -647,7 +652,7 @@ class TurtleBot:
         # print(self.nav_path.poses)
         if(len(self.nav_path.poses)>0):
 
-            i = 10
+            i = 0
             poses = self.nav_path.poses
             self.vel_msg = Twist()
             self.vel_msg.linear.x = 0
@@ -656,7 +661,7 @@ class TurtleBot:
             self.velocity_publisher.publish(self.vel_msg)
         
         
-            while ((i<len(poses)-1)  and  ((time.time() - self.start_time)<700)):
+            while ((i<len(poses)-1)  and  ((time.time() - self.start_time)<500)):
                 # if(self.agent_name == 'robot_7'):
                 #         print(poses[i])
                 self.vel_msg = Twist()
@@ -720,10 +725,11 @@ class TurtleBot:
                 self.vel_msg.linear.x = 0
                 self.velocity_publisher.publish(self.vel_msg)
                 print("Task completion time for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
+                self.path_received = False
                 return (time.time() - self.start_time)
             else:
                 print("Goal not within tolerance")
-                while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<900)):
+                while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<500)):
                     self.vel_msg.linear.x = self.linear_vel(self.goal_pose,0.5)
                     self.update_RVO(self.vel_msg.linear.x)
                     if(self.state_description == 1):
@@ -754,5 +760,9 @@ class TurtleBot:
                 self.path_received = False
                 return (time.time() - self.start_time)
         else:
+            self.path_received = False
             print("No Nav Path "+self.agent_name)
+        self.path_received = False
+        return 0
+            
 
