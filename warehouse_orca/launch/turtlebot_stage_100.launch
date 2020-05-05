@@ -59,7 +59,8 @@
     <param name="OccupyThresh" value="-1"/>
     <param name="InflateRadius" value="2.0"/>
     <param name="rate" value="10"/>
-  </include><node pkg="warehouse_orca" name="rob3" type="turtle_instance_laser_astar_node.py" ns="robot_3" output="screen"/>   
+  </include>
+  <node pkg="warehouse_orca" name="rob3" type="turtle_instance_laser_astar_node.py" ns="robot_3" output="screen"/>   
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_3"/>
      <param name="Euclidean" value="false"/>
@@ -73,7 +74,7 @@
     <param name="OccupyThresh" value="-1"/>
     <param name="InflateRadius" value="2.0"/>
     <param name="rate" value="10"/>
-  </include><node pkg="warehouse_orca" name="rob5" type="turtle_instance_laser_astar_node.py" ns="robot_5" output="screen"/>   
+   </include><node pkg="warehouse_orca" name="rob5" type="turtle_instance_laser_astar_node.py" ns="robot_5" output="screen"/>   
   <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_5"/>
      <param name="Euclidean" value="false"/>
@@ -380,7 +381,7 @@
     <param name="OccupyThresh" value="-1"/>
     <param name="InflateRadius" value="2.0"/>
     <param name="rate" value="10"/>
-  </include>
+  </include> -->
   <!-- <node pkg="warehouse_orca" name="rob50" type="turtle_instance_laser_astar_node.py" ns="robot_50" output="screen"/>    <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_50"/>
     <param name="Euclidean" value="false"/>

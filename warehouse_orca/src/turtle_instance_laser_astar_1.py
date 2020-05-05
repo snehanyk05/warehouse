@@ -740,7 +740,7 @@ class TurtleBot:
         return 0
 
     def headTowardsGoal(self,distance_tolerance):
-        while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<800)):
+        while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<700)):
                     self.vel_msg.linear.x = self.linear_vel(self.goal_pose,0.5)
                     self.update_RVO(self.vel_msg.linear.x)
                     if(self.state_description == 1):

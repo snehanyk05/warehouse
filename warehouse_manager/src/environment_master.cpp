@@ -15,7 +15,7 @@ void EnvironmentMaster::init() {
   //Code block for reading robot task assignmnet from a text file
   robot_number_ = 0;
   robot_count_ = 0;
-  std::ifstream f("/home/sneha/catkin_ws/src/warehouse/warehouse_manager/task100robot10.txt");
+  std::ifstream f("/home/sneha/catkin_ws/src/warehouse/warehouse_manager/task900robot15.txt");
   if(f.is_open()){
     while(f){
       std::string line;
@@ -172,7 +172,7 @@ bool EnvironmentMaster::all_task_complete(warehouse_manager::Robot_Gen_Report::R
 void EnvironmentMaster::add_to_report(int robot_number)
 {
   std::ofstream outfile;
-  outfile.open("/home/sneha/catkin_ws/src/warehouse/warehouse_manager/task100robot10_report.txt", std::ios_base::app);
+  outfile.open("/home/sneha/catkin_ws/src/warehouse/warehouse_manager/task900robot15_report.txt", std::ios_base::app);
   if(robot_number >= 0 )
   {
     outfile << "\n" << "\n";

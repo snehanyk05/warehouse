@@ -603,7 +603,9 @@ class TurtleBot:
             # self.check_all_in(total)
 
     def requestTasks(self):
+        
         if((self.goal_receive == False)):
+            print(self.goal_receive)
             result = self.goalServiceRequest()
             if(result.task_available == True):
              
@@ -613,6 +615,7 @@ class TurtleBot:
                 self.goal_receive = True
             else:
                 print("Request Failed")
+                exit(0)
         else:
             if(self.path_received == True):
                 if(len(self.nav_path.poses)>0):
@@ -626,8 +629,6 @@ class TurtleBot:
                 else:
                     self.busy = False
                     self.goal_receive = False
-                
-            
             # else:
             #     self.busy = False
             #     self.goal_receive == False

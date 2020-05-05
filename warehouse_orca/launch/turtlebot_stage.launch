@@ -83,7 +83,7 @@
     <param name="InflateRadius" value="2.0"/>
     <param name="rate" value="10"/>
   </include>
-   <include file="$(find astar)/launch/astar.launch">
+   <!-- <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_10"/>
     <param name="Euclidean" value="false"/>
     <param name="OccupyThresh" value="-1"/>
@@ -355,7 +355,7 @@
     <param name="OccupyThresh" value="-1"/>
     <param name="InflateRadius" value="2.0"/>
     <param name="rate" value="10"/>  
-    </include>  
+    </include>   -->
     <!-- <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_50"/>
     <param name="Euclidean" value="false"/>
