@@ -7,82 +7,58 @@
   </node>
 
 
-  <node pkg="map_server" name="map_server" type="map_server" args="$(find warehouse_orca)/stage/AddverbMap.yaml"/>
+  <!-- <node pkg="map_server" name="map_server" type="map_server" args="$(find warehouse_orca)/stage/AddverbMap.yaml"/> -->
   
-  <!-- <node pkg="warehouse_orca" name="rob0" type="turtle_instance_laser_astar_node.py" ns="robot_0" output="screen"/> -->
-  <!-- <node pkg="warehouse_orca" name="robot_1" type="turtle_instance_laser_astar_1.py"/> -->
-  <!-- <node pkg="astar" type="astar" name="astar" ns="robot_0" /> -->
-	<!-- <node name="rob0" pkg="dwa" type="rob.py" ns="robot_0" output="screen"/> -->
-   <include file="$(find astar)/launch/astar.launch">
+  
+   <node type="mapping_node" name="mapping_node" pkg="mapping" output="screen">
+        <param name="map_topic" value="/map"/>
+        <param name="goal_topic" value="/goal"/>
+        <param name="pose_topic" value="/pose"/>
+        <param name="height" value="60"/>
+        <param name="width" value="100"/>
+        <param name="resolution" value="1"/>
+        <!--<param name="save_map" value=""/>-->
+        <param name="load_map" value="$(find warehouse_orca)/stage/AddverbMap.png"/>
+    </node>
+  
+  <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_0"/>
-    <param name="Euclidean" value="false"/>
-    <param name="OccupyThresh" value="-1"/>
-    <param name="InflateRadius" value="2.0"/>
-    <param name="rate" value="10"/>
   </include>
-   <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find astar)/rviz/astar.rviz"/> -->
-  <include file="$(find astar)/launch/astar.launch">
+  <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_1"/>
-     <param name="Euclidean" value="false"/>
-    <param name="OccupyThresh" value="-1"/>
-    <param name="InflateRadius" value="2.0"/>
-    <param name="rate" value="10"/>
   </include>
-  <include file="$(find astar)/launch/astar.launch">
+  <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_2"/>
-     <param name="Euclidean" value="false"/>
-    <param name="OccupyThresh" value="-1"/>
-    <param name="InflateRadius" value="2.0"/>
-    <param name="rate" value="10"/>
   </include>
-   <include file="$(find astar)/launch/astar.launch">
+  <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_3"/>
-     <param name="Euclidean" value="false"/>
-    <param name="OccupyThresh" value="-1"/>
-    <param name="InflateRadius" value="2.0"/>
-    <param name="rate" value="10"/>
   </include>
-  <include file="$(find astar)/launch/astar.launch">
+  <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_4"/>
-     <param name="Euclidean" value="false"/>
-    <param name="OccupyThresh" value="-1"/>
-    <param name="InflateRadius" value="2.0"/>
-    <param name="rate" value="10"/>
   </include>
-  <include file="$(find astar)/launch/astar.launch">
+  <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_5"/>
-     <param name="Euclidean" value="false"/>
-    <param name="OccupyThresh" value="-1"/>
-    <param name="InflateRadius" value="2.0"/>
-    <param name="rate" value="10"/>
   </include>
-  <include file="$(find astar)/launch/astar.launch">
+  <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_6"/>
-     <param name="Euclidean" value="false"/>
-    <param name="OccupyThresh" value="-1"/>
-    <param name="InflateRadius" value="2.0"/>
-    <param name="rate" value="10"/>
   </include>
-  <include file="$(find astar)/launch/astar.launch">
+  <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_7"/>
-     <param name="Euclidean" value="false"/>
-    <param name="OccupyThresh" value="-1"/>
-    <param name="InflateRadius" value="2.0"/>
-    <param name="rate" value="10"/>
   </include>
-  <include file="$(find astar)/launch/astar.launch">
+  <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_8"/>
-     <param name="Euclidean" value="false"/>
-    <param name="OccupyThresh" value="-1"/>
-    <param name="InflateRadius" value="2.0"/>
-    <param name="rate" value="10"/>
-  </include><include file="$(find astar)/launch/astar.launch">
+  </include><include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_9"/>
+  </include>
+<!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find astar)/rviz/astar.rviz"/> -->
+
+</launch>
+    <!-- <arg name="robot" value="robot_9"/>
      <param name="Euclidean" value="false"/>
     <param name="OccupyThresh" value="-1"/>
     <param name="InflateRadius" value="2.0"/>
     <param name="rate" value="10"/>
-  </include>
+  </include> -->
    <!-- <include file="$(find astar)/launch/astar.launch">
     <arg name="robot" value="robot_10"/>
     <param name="Euclidean" value="false"/>
@@ -698,5 +674,5 @@
     <param name="InflateRadius" value="2.0"/>
     <param name="rate" value="10"/>
   </include> -->
-</launch>
+<!-- </launch> -->
 

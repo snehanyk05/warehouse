@@ -1,0 +1,18 @@
+
+Time and distance: 
+Robot: 10 Time: 0 Distance: 1.4013e-45
+Robot: 9 Time: 927.083 Distance: 1.4013e-45
+Robot: 8 Time: 1947.93 Distance: 1.4013e-45
+Robot: 7 Time: 4377.21 Distance: 1.4013e-45
+Robot: 6 Time: 5583.99 Distance: 1.4013e-45
+Robot: 5 Time: 7340.12 Distance: 1.4013e-45
+Robot: 4 Time: 8296.05 Distance: 1.4013e-45
+Robot: 3 Time: 10304.3 Distance: 1.4013e-45
+Robot: 2 Time: 11524.1 Distance: 1.4013e-45
+Robot: 1 Time: 13330.4 Distance: 1.4013e-45
+Robot: 0 Time: 15505.1 Distance: 1.4013e-45
+
+
+Total-  Time: 79136.2 Distance: 1.54143e-44
+
+Total number of collisions: 5

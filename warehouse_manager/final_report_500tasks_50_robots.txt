@@ -1,0 +1,61 @@
+
+
+
+Time and distance: 
+Robot: 50 Time: 0 Distance: -2.1406e-24
+Robot: 49 Time: 2317.73 Distance: -2.1406e-24
+Robot: 48 Time: 5894.38 Distance: -2.1406e-24
+Robot: 47 Time: 8469.04 Distance: -2.1406e-24
+Robot: 46 Time: 11373.4 Distance: -2.1406e-24
+Robot: 45 Time: 13563.4 Distance: -2.1406e-24
+Robot: 44 Time: 13563.4 Distance: -2.1406e-24
+Robot: 43 Time: 16650.6 Distance: -2.1406e-24
+Robot: 42 Time: 19828.6 Distance: -2.1406e-24
+Robot: 41 Time: 22564.1 Distance: -2.1406e-24
+Robot: 40 Time: 25442.1 Distance: -2.1406e-24
+Robot: 39 Time: 29303 Distance: -2.1406e-24
+Robot: 38 Time: 31622.4 Distance: -2.1406e-24
+Robot: 37 Time: 34041.9 Distance: -2.1406e-24
+Robot: 36 Time: 36064 Distance: -2.1406e-24
+Robot: 35 Time: 39692.7 Distance: -2.1406e-24
+Robot: 34 Time: 43442.2 Distance: -2.1406e-24
+Robot: 33 Time: 46597.6 Distance: -2.1406e-24
+Robot: 32 Time: 48015.4 Distance: -2.1406e-24
+Robot: 31 Time: 49852.7 Distance: -2.1406e-24
+Robot: 30 Time: 50654.6 Distance: -2.1406e-24
+Robot: 29 Time: 52450.9 Distance: -2.1406e-24
+Robot: 28 Time: 55558.8 Distance: -2.1406e-24
+Robot: 27 Time: 58443.3 Distance: -2.1406e-24
+Robot: 26 Time: 61078.9 Distance: -2.1406e-24
+Robot: 25 Time: 63568.6 Distance: -2.1406e-24
+Robot: 24 Time: 66123.7 Distance: -2.1406e-24
+Robot: 23 Time: 68799.2 Distance: -2.1406e-24
+Robot: 22 Time: 68799.2 Distance: -2.1406e-24
+Robot: 21 Time: 71455.8 Distance: -2.1406e-24
+Robot: 20 Time: 74636.2 Distance: -2.1406e-24
+Robot: 19 Time: 77571.7 Distance: -2.1406e-24
+Robot: 18 Time: 79645.5 Distance: -2.1406e-24
+Robot: 17 Time: 82323.3 Distance: -2.1406e-24
+Robot: 16 Time: 85952.7 Distance: -2.1406e-24
+Robot: 15 Time: 88943.9 Distance: -2.1406e-24
+Robot: 14 Time: 90765.1 Distance: -2.1406e-24
+Robot: 13 Time: 92526 Distance: -2.1406e-24
+Robot: 12 Time: 94761.6 Distance: -2.1406e-24
+Robot: 11 Time: 96688.4 Distance: -2.1406e-24
+Robot: 10 Time: 98666.4 Distance: -2.1406e-24
+Robot: 9 Time: 101581 Distance: -2.1406e-24
+Robot: 8 Time: 104840 Distance: -2.1406e-24
+Robot: 7 Time: 107025 Distance: -2.1406e-24
+Robot: 6 Time: 109590 Distance: -2.1406e-24
+Robot: 5 Time: 111934 Distance: -2.1406e-24
+Robot: 4 Time: 114945 Distance: -2.1406e-24
+Robot: 3 Time: 116923 Distance: -2.1406e-24
+Robot: 2 Time: 118573 Distance: -2.1406e-24
+Robot: 1 Time: 122069 Distance: -2.1406e-24
+Robot: 0 Time: 124739 Distance: -2.1406e-24
+
+
+Total(1/Tasks)-  Time: 319538 Distance: -1.13452e-23
+Total Time(For all tasks)- 4108.6
+
+Total number of collisions: 35

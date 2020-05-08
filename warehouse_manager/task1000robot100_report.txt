@@ -1,0 +1,20 @@
+
+
+Task: 0 Robot: 1 Time: 0 Distance: 0
+Task: 1 Robot: 1 Time: 0 Distance: 0
+Task: 2 Robot: 1 Time: 0 Distance: 0
+Task: 3 Robot: 1 Time: 0 Distance: 0
+Task: 4 Robot: 1 Time: 0 Distance: 0
+Task: 5 Robot: 1 Time: 0 Distance: 0
+Task: 6 Robot: 1 Time: 0 Distance: 0
+Task: 7 Robot: 1 Time: 0 Distance: 0
+
+
+Task: 0 Robot: 1 Time: 0 Distance: 0
+Task: 1 Robot: 1 Time: 0 Distance: 0
+Task: 2 Robot: 1 Time: 0 Distance: 0
+Task: 3 Robot: 1 Time: 0 Distance: 0
+Task: 4 Robot: 1 Time: 0 Distance: 0
+Task: 5 Robot: 1 Time: 0 Distance: 0
+Task: 6 Robot: 1 Time: 0 Distance: 0
+Task: 7 Robot: 1 Time: 0 Distance: 0
