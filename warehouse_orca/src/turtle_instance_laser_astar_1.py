@@ -50,6 +50,7 @@ class TurtleBot:
         self.state_description = 0
         self.turtlebot3_state_num = 0
         self.busy = False
+        self.replan = False
         self.result = {}
         self.x = 0
         self.y = 0
@@ -381,7 +382,7 @@ class TurtleBot:
 
     def publish_to_information_channel(self,t):
         i = Information()
-        # i.wp = self.nav_path.poses
+        i.wp = self.nav_path.poses
         i.agent_name = t
         i.agent_pose_x = self.odom.pose.pose.position.x
         i.agent_pose_y = self.odom.pose.pose.position.y
@@ -404,7 +405,7 @@ class TurtleBot:
         self.y_temp = self.inf.agent_pose_y
         self.heading_temp = self.inf.agent_heading
         self.vel_mag_temp = self.inf.agent_vel_mag
-        # self.all_wps.update({self.name_temp: self.inf.wps})
+        self.all_wps.update({self.name_temp: self.inf.wp})
         self.pose_updated = [self.x_temp, self.y_temp, self.heading_temp, self.vel_mag_temp]
         self.all_agents_pose_dict.update({self.name_temp: self.pose_updated})
 # end
@@ -710,7 +711,7 @@ class TurtleBot:
         # print(goal)
         self.goal_publisher.publish(goal)
         print("In nav Path: Pose:("+str(self.odom.pose.pose.position.x)+","+ str(self.odom.pose.pose.position.y)+"), Goal:("+str(x)+","+ str(y)+")")
-        rospy.sleep(5)
+        rospy.sleep(2)
         
     # def requestTasks(self):
     #     result = self.goalServiceRequest()
@@ -740,29 +741,43 @@ class TurtleBot:
              self.requestTasks()
 
     def requestTasks(self):
-        if(self.busy == False and self.path_received == False):
-            # print("here")
-            result = self.goalServiceRequest()
-            # print("checking if got task "+self.agent_name)
-            if(result.task_available == True):
-                self.getNavPath(result.x,result.y)
-                self.result = result
-                self.x = result.x
-                self.y = result.y
-                self.busy = True
-                # print("here "+self.agent_name)
-            else:
+        if(True):
+            if(self.busy == False and self.path_received == False):
+                # print("here")
+                result = self.goalServiceRequest()
+                # print("checking if got task "+self.agent_name)
+                if(result.task_available == True):
+                    self.getNavPath(result.x,result.y)
+                    self.result = result
+                    self.x = result.x
+                    self.y = result.y
+                    self.busy = True
+                    # print("here "+self.agent_name)
+                else:
+                    
+                    print("Request Failed")
+                    exit(0)
+            elif(self.path_received == True):
+                self.publish_to_information_channel(self.agent_name)
+                rospy.sleep(2)
+                data = []
+                for i, value in list(self.all_wps.items()):
+                    for l in value:
+                        data.append(str(l.pose.position.x)+","+str(l.pose.position.y))
+                # print(data)
+                n = Num()
+                n.data = data
+                self.publish_obstacles_wp.publish(n)
+                rospy.sleep(2)
+
+                time = self.move2goal_rvo(self.x, self.y)
                 
-                print("Request Failed")
-                exit(0)
-        elif(self.path_received == True):
-            time = self.move2goal_rvo(self.x, self.y)
-            
-            self.busy = False
-            x = self.agent_name.split("_")
-            self.goalCompleteRequest(x[1],time,0)
-            self.path_received = False
-        # else:
+                self.busy = False
+                x = self.agent_name.split("_")
+                self.goalCompleteRequest(x[1],time,0)
+                self.path_received = False
+        else:
+            exit(0)
         #     print(str(self.path_received)+ " "+self.agent_name)
             # self.requestTasks()
   
@@ -790,13 +805,15 @@ class TurtleBot:
         return constant * delta       
 
     def move2goal_rvo(self,x,y):
-        self.start_time = time.time()
+
+        if(self.replan == False):
+            self.start_time = time.time()
         distance_tolerance = 0.2
         rospy.sleep(2)
         
         self.vel_msg = Twist()
-
-        print(self.agent_name+" "+str(len(self.nav_path.poses)))
+        temp_nav_path = self.nav_path.poses
+        # print(self.agent_name+" "+str(len(self.nav_path.poses)))
         if(len(self.nav_path.poses)>0):
             i = 0
             poses = self.nav_path.poses
@@ -805,10 +822,11 @@ class TurtleBot:
             self.vel_msg.angular.z = self.angular_vel((poses[i]).pose.position)
             
             self.velocity_publisher.publish(self.vel_msg)
-        
+             
         
             while((i<len(poses))  and ((time.time() - self.start_time)<500)):
-
+                self.nav_path.poses = temp_nav_path[i:(len(poses)-1)]
+                
                 self.vel_msg = Twist()
                 self.vel_msg.linear.x = self.linear_vel_pose((poses[i]))
                 self.vel_msg.angular.z = self.angular_vel((poses[i]).pose.position)
@@ -880,9 +898,11 @@ class TurtleBot:
                 self.vel_msg.linear.x = 0
                 self.velocity_publisher.publish(self.vel_msg)
                 print("Task completion time for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
+                self.nav_path = Path()
+                self.replan = False
                 return (time.time() - self.start_time)
-            else:
-                print("Goal not within tolerance")
+            elif (self.euclidean_distance(self.goal_pose) < 2.0):
+                print("Goal not within tolerance 2.0")
                 while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<900)):
                     self.vel_msg.linear.x = self.linear_vel(self.goal_pose,0.5)
                     self.update_RVO(self.vel_msg.linear.x)
@@ -928,7 +948,17 @@ class TurtleBot:
                 self.vel_msg.linear.x = 0
                 self.velocity_publisher.publish(self.vel_msg)
                 print("Task completion time for "+self.agent_name+"--- %s seconds ---" % (time.time() - self.start_time));
+                self.nav_path = Path()
+                self.replan = False
                 return (time.time() - self.start_time)
+            else:
+                print("Replan")
+                self.replan = True
+                self.path_received = False
+                self.getNavPath(self.goal_pose.pose.pose.position.x, self.goal_pose.pose.pose.position.y)
+                self.requestTasks()
+
+            
         else:
             print("No Nav Path")
 
