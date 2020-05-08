@@ -46,6 +46,7 @@ class TurtleBot:
         self.pub_pose = Odometry()
         self.inf = Information()
         self.start_time=time.time()
+        self.plan_time = time.time()
         self.track_time = time.time()
         self.state_description = 0
         self.turtlebot3_state_num = 0
@@ -193,12 +194,12 @@ class TurtleBot:
         # print(self.scan_data_)
         if (self.scan_data_['front'] > self.check_forward_dist_):
             
-                if (self.scan_data_['left'] < self.check_side_dist_):
+                if ((self.scan_data_['left'] < self.check_side_dist_) or (self.scan_data_['fleft'] < self.check_side_dist_)):
                     # print("obstacle on left turn right")
                     self.prev_tb3_pose_ = self.tb3_pose_
                     self.turtlebot3_state_num = TB3_RIGHT_TURN
                 
-                elif (self.scan_data_['right'] < self.check_side_dist_):
+                elif ((self.scan_data_['right'] < self.check_side_dist_) or (self.scan_data_['fright'] < self.check_side_dist_)):
                     # print("obstacle on right turn left")
                     self.prev_tb3_pose_ = self.tb3_pose_
                     self.turtlebot3_state_num = TB3_LEFT_TURN
@@ -211,12 +212,24 @@ class TurtleBot:
 
         if (self.scan_data_['front'] < self.check_forward_dist_):
                 
-                if ((self.scan_data_['left'] < self.check_side_dist_) and (self.scan_data_['right'] < self.check_side_dist_)):
+                if ((self.scan_data_['left'] < self.check_side_dist_) and (self.scan_data_['right'] < self.check_side_dist_) and (self.scan_data_['fright'] < self.check_side_dist_) and (self.scan_data_['fleft'] < self.check_side_dist_)):
                 
                     self.prev_tb3_pose_ = self.tb3_pose_
                     self.turtlebot3_state_num = TB3_TURN_AROUND
         
+                elif ((self.scan_data_['left'] < self.check_side_dist_) and (self.scan_data_['right'] < self.check_side_dist_)):
                 
+                    self.prev_tb3_pose_ = self.tb3_pose_
+                    self.turtlebot3_state_num = TB3_TURN_AROUND
+                elif  ((self.scan_data_['fright'] < self.check_side_dist_) and (self.scan_data_['fleft'] < self.check_side_dist_)): 
+                    self.prev_tb3_pose_ = self.tb3_pose_
+                    self.turtlebot3_state_num = TB3_TURN_AROUND
+                elif ((self.scan_data_['fright'] < self.check_side_dist_) and (self.scan_data_['right'] < self.check_side_dist_)): 
+                    self.prev_tb3_pose_ = self.tb3_pose_
+                    self.turtlebot3_state_num = TB3_LEFT_TURN 
+                elif ((self.scan_data_['fleft'] < self.check_side_dist_) and (self.scan_data_['left'] < self.check_side_dist_)): 
+                    self.prev_tb3_pose_ = self.tb3_pose_
+                    self.turtlebot3_state_num = TB3_RIGHT_TURN    
                 else:
                     self.prev_tb3_pose_ = self.tb3_pose_
                     self.turtlebot3_state_num = TB3_RIGHT_TURN
@@ -808,6 +821,9 @@ class TurtleBot:
 
         if(self.replan == False):
             self.start_time = time.time()
+        self.plan_time = time.time()
+
+  
         distance_tolerance = 0.2
         rospy.sleep(2)
         
@@ -824,14 +840,18 @@ class TurtleBot:
             self.velocity_publisher.publish(self.vel_msg)
              
         
-            while((i<len(poses))  and ((time.time() - self.start_time)<500)):
+            while((i<len(poses))  and ((time.time() - self.plan_time)<500)):
                 self.nav_path.poses = temp_nav_path[i:(len(poses)-1)]
-                
+                # data = []
+                # for l in self.nav_path.poses:
+                #         data.append(str(l.pose.position.x)+","+str(l.pose.position.y))
+
+                # print(data)
                 self.vel_msg = Twist()
                 self.vel_msg.linear.x = self.linear_vel_pose((poses[i]))
                 self.vel_msg.angular.z = self.angular_vel((poses[i]).pose.position)
                 self.velocity_publisher.publish(self.vel_msg)
-                while((self.euclidean_distance_pose(poses[i]) >= 0.5) and ((time.time() - self.start_time)<125)): 
+                while((self.euclidean_distance_pose(poses[i]) >= 0.5) and ((time.time() - self.plan_time)<125)): 
                     # if(self.agent_name == 'robot_7'):
 
                     #     print("In second loop")
@@ -903,7 +923,7 @@ class TurtleBot:
                 return (time.time() - self.start_time)
             elif (self.euclidean_distance(self.goal_pose) < 2.0):
                 print("Goal not within tolerance 2.0")
-                while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.start_time)<900)):
+                while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.plan_time)<900)):
                     self.vel_msg.linear.x = self.linear_vel(self.goal_pose,0.5)
                     self.update_RVO(self.vel_msg.linear.x)
                     if(self.state_description == 1):
@@ -952,7 +972,8 @@ class TurtleBot:
                 self.replan = False
                 return (time.time() - self.start_time)
             else:
-                print("Replan")
+
+                print("Replan "+self.agent_name+", EU dis: " + str(self.euclidean_distance(self.goal_pose)))
                 self.replan = True
                 self.path_received = False
                 self.getNavPath(self.goal_pose.pose.pose.position.x, self.goal_pose.pose.pose.position.y)
