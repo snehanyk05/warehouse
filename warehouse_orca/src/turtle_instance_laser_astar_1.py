@@ -273,7 +273,7 @@ class TurtleBot:
         linear_x = 0
         angular_z = 0
         
-       if self.state_description == 1:
+        if self.state_description == 1:
             linear_x = 0
             angular_z = 0
         elif self.state_description == 2:
