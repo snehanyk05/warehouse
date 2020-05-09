@@ -111,6 +111,96 @@
   </include><include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_29"/>
   </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_30"/>
+  </include>
+   <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_31"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_32"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_33"/>
+  </include>
+  
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_34"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_35"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_36"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_37"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_38"/>
+  </include><include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_39"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_40"/>
+  </include>
+   <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_41"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_42"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_43"/>
+  </include>
+  
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_44"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_45"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_46"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_47"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_48"/>
+  </include><include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_49"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_50"/>
+  </include>
+   <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_51"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_52"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_53"/>
+  </include>
+  
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_54"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_55"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_56"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_57"/>
+  </include>
+  <include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_58"/>
+  </include><include file="$(find planner)/launch/rrt_planner.launch">
+    <arg name="robot" value="robot_59"/>
+  </include>
 <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find astar)/rviz/astar.rviz"/> -->
 
 </launch>
