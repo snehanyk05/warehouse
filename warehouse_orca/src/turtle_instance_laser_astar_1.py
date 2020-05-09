@@ -273,18 +273,18 @@ class TurtleBot:
         linear_x = 0
         angular_z = 0
         
-        if self.state_description == 1:
+       if self.state_description == 1:
             linear_x = 0
             angular_z = 0
         elif self.state_description == 2:
             linear_x = 0
-            angular_z = -1.5
+            angular_z = -1.5708
         elif self.state_description == 3:
             linear_x = 0
-            angular_z = 1.5
+            angular_z = 1.5708
         elif self.state_description == 4:
             linear_x = 0
-            angular_z = -3.14
+            angular_z = -3.14159
         else: 
             rospy.loginfo("Invalid")
             linear_x = 0
