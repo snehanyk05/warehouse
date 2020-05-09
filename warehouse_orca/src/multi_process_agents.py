@@ -80,4 +80,4 @@ for i in agent_names:
 
 for i in p_name:
     i.start()
-    rospy.sleep(5)
+    rospy.sleep(10)

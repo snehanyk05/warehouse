@@ -754,7 +754,8 @@ class TurtleBot:
              self.requestTasks()
 
     def requestTasks(self):
-        if(True):
+        # if((self.agent_name == 'robot_8') or (self.agent_name == 'robot_9')):
+        if True:
             if(self.busy == False and self.path_received == False):
                 # print("here")
                 result = self.goalServiceRequest()
@@ -771,29 +772,106 @@ class TurtleBot:
                     print("Request Failed")
                     exit(0)
             elif(self.path_received == True):
-                self.publish_to_information_channel(self.agent_name)
-                rospy.sleep(2)
-                data = []
-                for i, value in list(self.all_wps.items()):
-                    for l in value:
-                        data.append(str(l.pose.position.x)+","+str(l.pose.position.y))
-                # print(data)
-                n = Num()
-                n.data = data
-                self.publish_obstacles_wp.publish(n)
-                rospy.sleep(2)
-
-                time = self.move2goal_rvo(self.x, self.y)
-                
+                self.goalConfig()
+                time_ = self.move2goal_rvo(self.x, self.y) 
+                if(time_ == None):
+                    while((time_ == None) and (time.time() - self.start_time)<3000):
+                        self.path_received = False
+                        time_ = self.replanning()
+                        if((time.time() - self.start_time)>2000):
+                            print("Stuck in loop "+ self.agent_name)
+                    if(time_ == None):
+                        print("Leaving with no time for "+self.agent_name)         
+                self.goalConfig()
                 self.busy = False
                 x = self.agent_name.split("_")
-                self.goalCompleteRequest(x[1],time,0)
+                self.goalCompleteRequest(x[1],time_,0)
                 self.path_received = False
+                # else:
+                #     self.path_received = False
+                #     time = self.checkAlternate()
+                #     self.busy = False
+                #     x = self.agent_name.split("_")
+                #     self.goalCompleteRequest(x[1],time,0)
+                #     self.path_received = False
+                    
+                    
+
+
         else:
             exit(0)
         #     print(str(self.path_received)+ " "+self.agent_name)
             # self.requestTasks()
-  
+
+    def goalConfig(self):
+        self.publish_to_information_channel(self.agent_name)
+        rospy.sleep(2)
+        data = []
+        for i, value in list(self.all_wps.items()):
+            for l in value:
+                data.append(str(l.pose.position.x)+","+str(l.pose.position.y))
+                # print(data)
+        n = Num()
+        n.data = data
+        self.publish_obstacles_wp.publish(n)
+        rospy.sleep(2)
+
+    def replanning(self):
+        print("In alternate "+self.agent_name)
+        if(self.replan == True):
+            print("In alternate replan "+self.agent_name)
+            self.getNavPath(self.x, self.y)
+            while(self.path_received == False):
+                if(self.path_received == True):
+                    break
+
+            if(self.path_received == True):
+                self.goalConfig()
+                if(len(self.nav_path.poses)>0):
+                    return self.move2goal_rvo(self.goal_pose.pose.pose.position.x , self.goal_pose.pose.pose.position.y)
+                else:
+                    print("In alternate replan-NEW "+self.agent_name)
+                    return self.checkAlternate()
+        else:
+            return self.checkAlternate()           
+
+    def checkAlternate(self):
+        print("In alternate NEW "+self.agent_name)
+        flag = False
+        x = -1
+        y = -1 
+
+        # z = self.x - 0
+        start_x = (self.x - 4) if ((self.x - 4)>0) else (self.x + 1)
+        start_y = (self.y - 4) if ((self.y - 4)>0) else (self.y + 1)
+        for i in np.arange((start_x),(start_x + 8),1):
+            for j in np.arange((start_y),(start_y + 8),1):
+
+                print(i,j)
+                self.getNavPath(i,j)
+                while(self.path_received == False):
+                    if(self.path_received == True):
+                        break
+
+                if(self.path_received == True):
+                    self.goalConfig()
+                    if(len(self.nav_path.poses)>0):
+                        flag = True
+                        x = i
+                        y = j
+                        break
+            if(flag == True):
+                break
+        if(flag == True):
+            return  self.move2goal_rvo(x, y) 
+        else:
+            return None
+                                     
+
+
+
+
+
     def linear_vel_pose(self, goal_pose, constant=1.5):
         return constant * self.euclidean_distance_pose(goal_pose)
     def linear_vel(self, goal_pose, constant=1.5):
@@ -921,8 +999,8 @@ class TurtleBot:
                 self.nav_path = Path()
                 self.replan = False
                 return (time.time() - self.start_time)
-            elif (self.euclidean_distance(self.goal_pose) < 2.0):
-                print("Goal not within tolerance 2.0")
+            elif (self.euclidean_distance(self.goal_pose) < 5.0):
+                print("Goal not within tolerance 5.0")
                 while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.plan_time)<900)):
                     self.vel_msg.linear.x = self.linear_vel(self.goal_pose,0.5)
                     self.update_RVO(self.vel_msg.linear.x)
@@ -972,14 +1050,22 @@ class TurtleBot:
                 self.replan = False
                 return (time.time() - self.start_time)
             else:
-
+                self.vel_msg.linear.x = 0
+                self.vel_msg.angular.z = 0
+                self.velocity_publisher.publish(self.vel_msg)
                 print("Replan "+self.agent_name+", EU dis: " + str(self.euclidean_distance(self.goal_pose)))
                 self.replan = True
                 self.path_received = False
-                self.getNavPath(self.goal_pose.pose.pose.position.x, self.goal_pose.pose.pose.position.y)
-                self.requestTasks()
+                return None
+                
+                # self.getNavPath(self.x, self.y)
+                # self.requestTasks()
 
             
         else:
             print("No Nav Path")
+            self.path_received = False
+            return None
+            # self.path_received = False
+            # return self.checkAlternate()
 
