@@ -278,13 +278,13 @@ class TurtleBot:
             angular_z = 0
         elif self.state_description == 2:
             linear_x = 0
-            angular_z = -1.5708
+            angular_z = -1.5
         elif self.state_description == 3:
             linear_x = 0
-            angular_z = 1.5708
+            angular_z = 1.5
         elif self.state_description == 4:
             linear_x = 0
-            angular_z = -3.14159
+            angular_z = -3.14
         else: 
             rospy.loginfo("Invalid")
             linear_x = 0
@@ -938,7 +938,7 @@ class TurtleBot:
                     
                 
                     self.update_RVO(self.vel_msg.linear.x)
-                    if(True):
+                    if(self.state_description == 1):
                         if(self.collision() == True):
                         # print("COLLLLLLISION")
                         #print("Inside RVO. Should choose new velocity")
@@ -977,7 +977,7 @@ class TurtleBot:
                     # print(self.vel_msg.angular.z)
                     # exit(0)
                     
-                    if(self.state_description != 1):
+                    else:
                         self.state_velocities();
                     self.velocity_publisher.publish(self.vel_msg)
                 # print("Pub 2");
@@ -1004,7 +1004,7 @@ class TurtleBot:
                 while ((self.euclidean_distance(self.goal_pose) >= distance_tolerance) and ((time.time() - self.plan_time)<900)):
                     self.vel_msg.linear.x = self.linear_vel(self.goal_pose,0.5)
                     self.update_RVO(self.vel_msg.linear.x)
-                    if(True):
+                    if(self.state_description == 1):
                         if(self.collision() == True):
                             # print("COLLLLLLISION")
                             #print("Inside RVO. Should choose new velocity")
@@ -1036,7 +1036,7 @@ class TurtleBot:
                         self.vel_msg.angular.z  = self.angular_vel_2(self.heading);
                         
                         
-                    if(self.state_description != 1):
+                    else:
                         self.state_velocities();
                     self.velocity_publisher.publish(self.vel_msg)
                     
