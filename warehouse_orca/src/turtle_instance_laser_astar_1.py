@@ -806,14 +806,14 @@ class TurtleBot:
     def goalConfig(self):
         self.publish_to_information_channel(self.agent_name)
         rospy.sleep(2)
-        data = []
-        for i, value in list(self.all_wps.items()):
-            for l in value:
-                data.append(str(l.pose.position.x)+","+str(l.pose.position.y))
-                # print(data)
-        n = Num()
-        n.data = data
-        self.publish_obstacles_wp.publish(n)
+        # data = []
+        # for i, value in list(self.all_wps.items()):
+        #     for l in value:
+        #         data.append(str(l.pose.position.x)+","+str(l.pose.position.y))
+        #         # print(data)
+        # n = Num()
+        # n.data = data
+        # self.publish_obstacles_wp.publish(n)
         rospy.sleep(2)
 
     def replanning(self):
