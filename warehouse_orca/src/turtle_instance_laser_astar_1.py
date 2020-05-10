@@ -772,7 +772,7 @@ class TurtleBot:
                     print("Request Failed")
                     exit(0)
             elif(self.path_received == True):
-                self.goalConfig()
+                # self.goalConfig()
                 time_ = self.move2goal_rvo(self.x, self.y) 
                 if(time_ == None):
                     while((time_ == None) and (time.time() - self.start_time)<3000):
@@ -782,7 +782,7 @@ class TurtleBot:
                             print("Stuck in loop "+ self.agent_name)
                     if(time_ == None):
                         print("Leaving with no time for "+self.agent_name)         
-                self.goalConfig()
+                # self.goalConfig()
                 self.busy = False
                 x = self.agent_name.split("_")
                 self.goalCompleteRequest(x[1],time_,0)
@@ -826,7 +826,7 @@ class TurtleBot:
                     break
 
             if(self.path_received == True):
-                self.goalConfig()
+                # self.goalConfig()
                 if(len(self.nav_path.poses)>0):
                     return self.move2goal_rvo(self.goal_pose.pose.pose.position.x , self.goal_pose.pose.pose.position.y)
                 else:
@@ -854,7 +854,7 @@ class TurtleBot:
                         break
 
                 if(self.path_received == True):
-                    self.goalConfig()
+                    # self.goalConfig()
                     if(len(self.nav_path.poses)>0):
                         flag = True
                         x = i
