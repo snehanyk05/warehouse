@@ -1,0 +1,6 @@
+float32 x_start
+float32 y_start
+float32 x_goal
+float32 y_goal
+---
+nav_msgs/Path Path

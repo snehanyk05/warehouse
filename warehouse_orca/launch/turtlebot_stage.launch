@@ -1,10 +1,10 @@
 
 <launch>
   
-  <arg name="world_file"    default="$(find warehouse_orca)/stage/AddverbMap.world" />
+  <!-- <arg name="world_file"    default="$(find warehouse_orca)/stage/AddverbMap.world" />
 
   <node pkg="stage_ros" type="stageros" name="stageros" args="$(arg world_file)">
-  </node>
+  </node> -->
 
 
   <!-- <node pkg="map_server" name="map_server" type="map_server" args="$(find warehouse_orca)/stage/AddverbMap.yaml"/> -->
@@ -20,7 +20,8 @@
         <!--<param name="save_map" value=""/>-->
         <param name="load_map" value="$(find warehouse_orca)/stage/AddverbMap.png"/>
     </node>
-  
+</launch>    
+<!--   
   <include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_0"/>
   </include>
@@ -321,9 +322,9 @@
   </include><include file="$(find planner)/launch/rrt_planner.launch">
     <arg name="robot" value="robot_99"/>
   </include>
-<!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find astar)/rviz/astar.rviz"/> -->
+<! <node pkg="rviz" type="rviz" name="rviz" args="-d $(find astar)/rviz/astar.rviz"/> -->
 
-</launch>
+<!-- </launch> --> 
     <!-- <arg name="robot" value="robot_9"/>
      <param name="Euclidean" value="false"/>
     <param name="OccupyThresh" value="-1"/>

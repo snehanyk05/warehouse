@@ -997,4 +997,4 @@ Robot: 0 Time: 451833 Distance: 1.10372e+15
 Total(1/Tasks)-  Time: 232298 Distance: 1.10372e+15
 Total Time(For all tasks)- 16032.4
 
-Total number of collisions: 129
+Total number of collisions: 45

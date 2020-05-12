@@ -1,0 +1,10 @@
+<launch>
+	<node pkg="dynamic_global_planner" type="smart_planner" name="smart_planner" output="screen" />
+	
+	<arg name="map_file" default="$(find warehouse_orca)/stage/AddverbMap.yaml"/>
+	
+    <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+    <node name="stage" pkg="stage_ros" type="stageros" args="$(find warehouse_orca)/stage/AddverbMap.world" />
+    
+</launch>
