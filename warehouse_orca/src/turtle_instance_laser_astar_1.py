@@ -8,7 +8,7 @@ from nav_msgs.msg import Odometry, Path
 from sensor_msgs.msg import LaserScan
 import sys
 from std_msgs.msg import String
-from rvo.msg import Information
+from rvo_ros.msg import Information
 from warehouse_manager.srv import Robot_Task_Complete, Robot_Task_Request
 from random import randint
 import numpy as np
